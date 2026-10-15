@@ -155,6 +155,7 @@
 .s-page { background: var(--s-page); min-height: 100%; }
 /* Real-device look: pinstriped background as on Smartisan OS Settings (optional) */
 .s-page--textured { background: var(--s-page-texture); }
+.s-root [hidden], .s-page [hidden] { display: none !important; }
 .s-root *, .s-page *, .s-root *::before, .s-page *::before, .s-root *::after, .s-page *::after { box-sizing: border-box; }
 
 .s-icon { width: 24px; height: 24px; flex: none; color: var(--s-icon); display: inline-block; vertical-align: middle; }
@@ -180,7 +181,12 @@
 }
 .s-appbar__spacer { flex: 1; }
 .s-appbar__actions { display: flex; align-items: center; gap: 18px; }
-.s-appbar > button, .s-appbar__actions > button:not(.s-btn-icon) { all: unset; cursor: pointer; display: inline-flex; color: var(--s-icon); }
+/* zero specificity on purpose: any class you put on an app-bar button overrides this reset */
+:where(.s-appbar > button, .s-appbar__actions > button):where(:not(.s-btn, .s-btn-icon)) { all: unset; cursor: pointer; display: inline-flex; align-items: center; color: var(--s-icon); }
+/* Text actions in the bar: prefer .s-btn.s-btn--sm (primary, e.g. 完成) or .s-btn.s-btn--outline (secondary),
+   both are 30px and sit in the 48px bar like the kit. Plain text fallback (not in the kit, derived): */
+.s-appbar__text { font-family: var(--s-font); font-size: 16px; font-weight: 500; color: var(--s-title-other); }
+.s-appbar__text:active { opacity: .6; }
 .s-appbar--red { background: var(--s-grad-appbar-red); border-bottom-color: var(--s-appbar-red-border); }
 /* Real device: the app bar casts an 8px soft fade onto the page (optional) */
 .s-appbar--shadow { z-index: 2; }
@@ -329,6 +335,12 @@ a.s-list-item:active *, button.s-list-item:active *, .s-list-item[data-pressable
 .s-list-item[aria-disabled="true"], .s-list-item[aria-disabled="true"] * { color: var(--s-disabled) !important; }
 .s-list-item[aria-disabled="true"] .s-icon { color: var(--s-icon-disabled) !important; }
 
+/* A control that should take the remaining width of a row (e.g. a volume slider):
+   <div class="s-list-item"><div class="s-list-item__text">…音量…</div><div class="s-list-item__control s-slider-row">…</div></div> */
+.s-list-item__control { flex: 1; min-width: 0; display: flex; align-items: center; gap: 16px; }
+.s-list-item__text:has(~ .s-list-item__control) { flex: none; }
+.s-list-item__control.s-slider-row > .s-icon { color: #808080; }
+
 /* List Tile 2 (253:2000) — title 18 + right-aligned 14px detail */
 .s-list-item--simple { gap: 18.4px; padding: 0 11.2px 0 18.4px; }
 .s-list-item--simple .s-list-item__title { font-size: 18px; color: #333; white-space: nowrap; }
@@ -389,6 +401,9 @@ a.s-list-item:active *, button.s-list-item:active *, .s-list-item[data-pressable
 /* ======================= Dialog (248:871) ======================= */
 .s-overlay { position: fixed; inset: 0; z-index: 100; display: flex; align-items: center; justify-content: center; padding: 32px; background: var(--s-overlay); }
 .s-overlay--inline { position: relative; inset: auto; z-index: auto; }
+.s-overlay[hidden] { display: none; }   /* .s-overlay sets display:flex, which would beat the UA [hidden] rule */
+.s-overlay:not([hidden]) { animation: s-fade-in .15s ease; }
+@keyframes s-fade-in { from { opacity: 0; } to { opacity: 1; } }
 .s-dialog { width: 368px; max-width: 100%; display: flex; flex-direction: column; font-family: var(--s-font); }
 .s-dialog.is-pressed { opacity: 0.9; }
 .s-dialog.is-pressed .s-dialog__body { color: var(--s-title-other); }
@@ -507,6 +522,11 @@ a.s-list-item:active *, button.s-list-item:active *, .s-list-item[data-pressable
 .s-slider::-moz-range-thumb { width: 20px; height: 20px; border-radius: 50%; background: var(--s-white); border: 0.4px solid #f1f1f1; box-shadow: var(--s-shadow-slider-thumb); }
 
 /* ======================= Toast (40:1076) ======================= */
+/* Toast host: fixed, centred above the bottom navigation. Toggle with [hidden] or use Smartisan.toast() from smartisan.js */
+.s-toast-host { position: fixed; left: 0; right: 0; bottom: 78px; z-index: 110; display: flex; justify-content: center; pointer-events: none; }
+.s-toast-host--in-frame { position: absolute; }   /* inside a position:relative phone frame instead of the viewport */
+.s-toast-host[hidden] { display: none; }
+.s-toast-host:not([hidden]) .s-toast { animation: s-fade-in .2s ease; }
 .s-toast { display: inline-flex; align-items: center; justify-content: center; padding: 12px 16px; font-family: var(--s-font); font-size: 14px; font-weight: 700; color: #ad8a67; background: var(--s-grad-toast); border: var(--s-hair-xs) solid #d2b89c; border-radius: var(--s-r-md); white-space: nowrap; }
 
 /* ======================= Bottom Navigation Bar (203:2020 / 72:178) ======================= */

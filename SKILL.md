@@ -1,6 +1,6 @@
 ---
 name: smartisan-ui
-description: 用 Smartisan OS（锤子科技 / 坚果手机）的 UI 风格做前端界面：轻拟物、细腻纵向渐变、极细描边、柔和投影与内凹阴影、灰阶为主 + 低饱和蓝强调 + 锤子红品牌色。当用户提到 Smartisan、锤子、锤子风格、坚果 OS、Smartisan OS、老罗/罗永浩那种拟物风、"像锤子手机一样的 UI"，或要求把网页/组件/App 原型做成这种风格时使用。内含完整的 Figma《Smartisan OS UI Kit (Unofficial)》（17 页、全部组件和变体）提取出的 token、组件规格、可直接引用的 CSS、Tailwind preset、图标和参考截图，并经 Smartisan R2 真机校对。
+description: 用 Smartisan OS（锤子科技 / 坚果手机）的 UI 风格做前端界面：轻拟物、细腻纵向渐变、极细描边、柔和投影与内凹阴影、灰阶为主 + 低饱和蓝强调 + 锤子红品牌色。当用户提到 Smartisan、锤子、锤子风格、坚果 OS、Smartisan OS、老罗/罗永浩那种拟物风、"像锤子手机一样的 UI"，或要求把网页/组件/App 原型做成这种风格时使用。适用于网页（HTML/CSS/Tailwind/任意前端框架）和 Flutter。内含完整的 Figma《Smartisan OS UI Kit (Unofficial)》（17 页、全部组件和变体）提取出的 token、组件规格、可直接引用的 CSS、Tailwind preset、图标和参考截图，并经 Smartisan R2 真机校对。
 ---
 
 # Smartisan OS UI 风格
@@ -13,7 +13,9 @@ description: 用 Smartisan OS（锤子科技 / 坚果手机）的 UI 风格做�
 
 | 文件 | 用途 |
 |---|---|
-| `assets/smartisan.css` | 全部 token（CSS 变量）+ 全部组件类 `.s-*`。**做页面时优先直接引用这一份** |
+| `assets/smartisan.css` | 全部 token（CSS 变量）+ 全部组件类 `.s-*`。**做网页时优先直接引用这一份** |
+| `assets/smartisan.js` | 可选的交互小工具：滑块进度自动同步、对话框开关（`data-s-open` / `data-s-close`、点遮罩和 Esc 关闭）、`Smartisan.toast()` |
+| `assets/flutter/*.dart` | **Flutter 版**：token（`smartisan_theme.dart`）、23 个矢量图标（`smartisan_icons.dart`）、全部组件（`smartisan_widgets.dart`），只依赖 Flutter SDK。用法见 `references/flutter.md` |
 | `assets/demo.html` | 整套 Kit 的 1:1 复刻：17 页，每个变体都有，外加一块"Real device"展示板。拿不准 HTML 结构时照抄这里 |
 | `assets/icons-sprite.svg` | 29 个图标的 `<symbol>`：单色 `si-*`（`currentColor`）+ 彩色 `si-c-*`。内联到 `<body>` 开头后用 `<svg class="s-icon"><use href="#si-back"/></svg>` |
 | `assets/icons/*.svg` | 29 个原始图标（保留原渐变） |
@@ -24,17 +26,30 @@ description: 用 Smartisan OS（锤子科技 / 坚果手机）的 UI 风格做�
 | `assets/tailwind.preset.js` | Tailwind preset（`bg-s-grey-100`、`rounded-s-lg`、`shadow-s-card`……） |
 | `references/tokens.md` | 颜色 / 渐变 / 字体 / 圆角 / 描边 / 阴影 / 尺寸全表，含 [R2] 实测值 |
 | `references/components.md` | 每个组件的 HTML 结构、尺寸、所有状态的取值 |
+| `references/flutter.md` | Flutter 接入步骤、CSS→Flutter 组件对照、常见错误 |
 | `references/inventory.md` | Figma 节点清单：节点 ID → 组件 / 变体 → CSS 类 → 截图 → 素材 |
 | `references/screenshots/NN-*.png` | 17 个 Figma 页面的截图，作为视觉对照 |
 
 ## 工作流程
 
+**先判断技术栈**：
+- **Flutter 项目** → 读 `references/flutter.md`，把 `assets/flutter/*.dart` 复制到 `lib/smartisan/`，然后用 `S*` 组件写页面。不要直接用 Material 控件，也不要从 CSS 自己翻译。
+- **React / Vue / 原生 iOS / Android 等其它栈** → 按 `references/components.md` 和 `assets/tokens.json` 实现，外观以 `references/screenshots/` 为准。
+- **网页（HTML / CSS / 任意前端框架）** → 走下面的步骤。
+
 1. **先看 `assets/demo.html`** 里对应组件的写法；需要精确数值时查 `references/components.md` 和 `tokens.md`；不确定长什么样时，直接看 `references/screenshots/` 里那一页的截图（可以用 Read 读图）。
 2. **把 `assets/smartisan.css` 复制进项目**（或移植到项目现有的样式体系：Tailwind 项目用 `tailwind.preset.js`，CSS-in-JS 项目读 `tokens.json`）。不要凭感觉重新调色。
 3. 根元素加 `class="s-page"`；想要真机那种竖条纹底，再加 `s-page--textured`。
 4. 把 `icons-sprite.svg` 内联到 `<body>` 开头。注意它的隐藏方式是 `position:absolute; width:0; height:0`，**不能改成 `display:none`**，否则彩色图标里的渐变不会渲染。
-5. 用户要 React / Vue 组件时，按 `.s-*` 的结构和 `components.md` 的状态表来封装：pressed、disabled、selected 都要做齐。`.is-pressed` 可以用来静态展示按下态。
-6. 做完后按下方「自检清单」逐条检查；有浏览器的话截图和 `references/screenshots/` 对比。
+5. 交互部分可以引入 `assets/smartisan.js`：
+   - 对话框和 Toast 用 `hidden` 属性控制显示和隐藏；
+   - `<button data-s-open="dlg">` 打开对话框，对话框里的 `data-s-close` 关闭它；
+   - `Smartisan.toast('已保存')` 弹出提示，它会自动放进 `.s-toast-host`；
+   - 滑块的进度条填充（`--p`）会自动更新。
+
+   App Bar 里要放文字按钮时，用 `.s-btn.s-btn--sm`（主操作，如"完成"）或 `.s-btn--outline`；只放纯文字用 `.s-appbar__text`。列表行里要放占满剩余宽度的控件（如音量滑块），给控件加 `.s-list-item__control`。
+6. 用户要 React / Vue 组件时，按 `.s-*` 的结构和 `components.md` 的状态表来封装：pressed、disabled、selected 都要做齐。`.is-pressed` 可以用来静态展示按下态。
+7. 做完后按下方「自检清单」逐条检查；有浏览器的话截图和 `references/screenshots/` 对比。
 
 ## 美学要点（为什么看起来像锤子）
 

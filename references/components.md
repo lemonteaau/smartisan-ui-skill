@@ -27,6 +27,7 @@
 - Red：底 `#cd3f3a→#c83530`，底边 `#b7241f`，标题和图标都是白色。
 - 属性：`showBack`、`show1stIcon`（默认 confirm 24px）、`show2ndIcon`（默认 setting 20px），图标可替换。
 - 示例：Settings（无返回，右侧放 Icon Button），App Store（红色，只有返回）。
+- 文字操作：主操作（如"完成"）用 `.s-btn.s-btn--sm`，次要操作用 `.s-btn.s-btn--outline`，两者都是 30px 高；纯文字用 `.s-appbar__text`（16px 500 `#636363`，Kit 里没有，是推导出来的）。按钮重置规则的特异性为 0，加在按钮上的任何类都能覆盖它。
 
 ## 2. Buttons
 ### Elevated Button · `.s-btn`（`18:7`）
@@ -139,6 +140,7 @@
   <div class="s-dialog__actions"><button>取消</button><button data-primary>确定</button></div>
 </div></div>
 ```
+- 用 `hidden` 属性控制显示和隐藏（`.s-overlay[hidden]` 已经处理），出现时有 0.15s 淡入；配合 `smartisan.js` 可以用 `data-s-open` / `data-s-close` 开关，点遮罩或按 Esc 关闭（加 `data-s-modal` 可禁止）。
 - 遮罩 `rgba(0,0,0,.6)`；对话框宽 368（在 432 宽屏幕上左右各留 32）。
 - **Dialog Header**（`171:272`）：高 48，底 `#fafafa`，底线 1px `#ededed`，上圆角 12，18px 700 `#636363` 居中。
 - **Content**：白底，内边距 20，16px / 行高 24 `#656565`。
@@ -189,6 +191,8 @@
 - Enabled：白底，行下 0.8px `#f2f2f2`（在 `.s-list` 内自动加，单独使用时加 `.s-list-item--divider`）。
 - Pressed：底 Blue/300 `#5985eb`，0.4px Blue/500 `#3f68e2`，所有文字和图标变白。
 - Disabled：文字 `#bababa`，图标 Fill/Icon/Disabled 渐变。
+### 行内控件 · `.s-list-item__control`
+- 用于需要占满剩余宽度的控件，例如音量滑块：`<div class="s-list-item"><div class="s-list-item__text">…音量…</div><div class="s-list-item__control s-slider-row">图标 + 滑块 + 图标</div></div>`。有它时标题区不再自动撑满。
 ### List Item Detail · `.s-list-item__detail`（`253:1360`）
 - 16px `#7f7f7f` + 24px `>`（`#b2b2b2`）；Pressed 时文字和箭头都变白。
 ### List Tile 2 · `.s-list-item--simple`（`253:2000`）
@@ -235,6 +239,7 @@
 - 滑块 `.s-slider`（`<input type="range">`，用 `--p` 设置 0–100）：轨道高 4，胶囊，`#efefef`，`inset 0 4px 4px rgba(0,0,0,.06)`；已填充部分 `#668ff7→#7ca3fb`（原稿还有 1px `#7198ff` 描边）；旋钮 20px 白圆，0.4px `#f1f1f1`，投影 `0 4px 8px rgba(0,0,0,.16)`。
 
 ## 15. Toast · `.s-toast`（`40:1076`）
+- 定位：外面包一层 `.s-toast-host`，固定在底部导航上方 78px 处、水平居中；用 `hidden` 属性控制显示。放在手机外框里时加 `--in-frame`（改用 absolute 定位）。也可以直接调用 `smartisan.js` 的 `Smartisan.toast(text)`。
 - 218×41：内边距 12px 16px，圆角 6，`#fcf6e6→#fcf3dc`，0.4px `#d2b89c`，14px 700 `#ad8a67`，不换行。示例文案 "Network error, pls try again"。
 
 ## 16. 文档外框（Kit chrome，可选）
