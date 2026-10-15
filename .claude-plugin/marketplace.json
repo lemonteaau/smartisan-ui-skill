@@ -1,0 +1,19 @@
+{
+  "name": "smartisan-ui-skill",
+  "owner": {
+    "name": "lemonteaau"
+  },
+  "metadata": {
+    "description": "Smartisan OS (锤子 / 坚果) UI style skill for web and Flutter",
+    "version": "1.1.0"
+  },
+  "plugins": [
+    {
+      "name": "smartisan-ui",
+      "description": "Build web and Flutter UI in the Smartisan OS style: full UI kit tokens, CSS components, Flutter widgets, icons and references, verified on a real Smartisan R2.",
+      "source": "./",
+      "strict": false,
+      "skills": ["./"]
+    }
+  ]
+}
