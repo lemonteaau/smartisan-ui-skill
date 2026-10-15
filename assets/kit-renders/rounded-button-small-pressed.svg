@@ -1,0 +1,32 @@
+<svg width="31.3333" height="33.6667" viewBox="0 0 31.3333 33.6667" fill="none" xmlns="http://www.w3.org/2000/svg">
+<g id="Rounded Button">
+<circle id="Outter" cx="15.6667" cy="14" r="14" fill="#F5F5F5"/>
+<g id="Inner" filter="url(#filter0_d_rounded_button_small_pressed)">
+<circle cx="15.6667" cy="14" r="11.6667" fill="url(#paint0_linear_rounded_button_small_pressed)"/>
+<circle cx="15.6667" cy="14" r="11.4667" stroke="#EEEEEE" stroke-width="0.4"/>
+</g>
+<g id="Icon-Play">
+<path id="Vector" d="M20.4583 13.8018C20.4586 13.9079 20.4314 14.0123 20.3794 14.1047C20.3273 14.1972 20.2523 14.2747 20.1615 14.3295L14.5333 17.7725C14.4384 17.8306 14.3298 17.8623 14.2185 17.8644C14.1073 17.8664 13.9975 17.8388 13.9005 17.7842C13.8045 17.7305 13.7245 17.6522 13.6687 17.5573C13.613 17.4624 13.5835 17.3544 13.5833 17.2444V10.3592C13.5835 10.2492 13.613 10.1412 13.6687 10.0463C13.7245 9.95139 13.8045 9.87307 13.9005 9.81937C13.9975 9.76482 14.1073 9.73714 14.2185 9.7392C14.3298 9.74126 14.4384 9.77298 14.5333 9.83109L20.1615 13.2741C20.2523 13.3289 20.3273 13.4064 20.3794 13.4988C20.4314 13.5913 20.4586 13.6957 20.4583 13.8018Z" fill="url(#paint1_linear_rounded_button_small_pressed)"/>
+</g>
+</g>
+<defs>
+<filter id="filter0_d_rounded_button_small_pressed" x="0" y="2.33333" width="31.3333" height="31.3333" filterUnits="userSpaceOnUse" color-interpolation-filters="sRGB">
+<feFlood flood-opacity="0" result="BackgroundImageFix"/>
+<feColorMatrix in="SourceAlpha" type="matrix" values="0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 127 0" result="hardAlpha"/>
+<feOffset dy="4"/>
+<feGaussianBlur stdDeviation="2"/>
+<feComposite in2="hardAlpha" operator="out"/>
+<feColorMatrix type="matrix" values="0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0.12 0"/>
+<feBlend mode="normal" in2="BackgroundImageFix" result="effect1_dropShadow_rounded_button_small_pressed"/>
+<feBlend mode="normal" in="SourceGraphic" in2="effect1_dropShadow_rounded_button_small_pressed" result="shape"/>
+</filter>
+<linearGradient id="paint0_linear_rounded_button_small_pressed" x1="15.6667" y1="2.33333" x2="15.6667" y2="25.6667" gradientUnits="userSpaceOnUse">
+<stop stop-color="#EBEBEB"/>
+<stop offset="1" stop-color="#F2F2F2"/>
+</linearGradient>
+<linearGradient id="paint1_linear_rounded_button_small_pressed" x1="17.0208" y1="9.7391" x2="17.0208" y2="17.8645" gradientUnits="userSpaceOnUse">
+<stop stop-color="#8C8C8C"/>
+<stop offset="1" stop-color="#989898"/>
+</linearGradient>
+</defs>
+</svg>

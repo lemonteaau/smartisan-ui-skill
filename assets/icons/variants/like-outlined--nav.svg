@@ -1,0 +1,11 @@
+<svg width="22" height="22" viewBox="0 0 22 22" fill="none" xmlns="http://www.w3.org/2000/svg">
+<g id="icon-like-outlined">
+<path id="Vector" d="M4 8.25V19.25H0V8.25H4ZM8 19.25C7.46957 19.25 6.96086 19.0568 6.58579 18.713C6.21071 18.3692 6 17.9029 6 17.4167V8.25C6 7.74583 6.22 7.2875 6.59 6.9575L13.17 0.916667L14.23 1.88833C14.5 2.13583 14.67 2.475 14.67 2.85083L14.64 3.14417L13.69 7.33333H20C20.5304 7.33333 21.0391 7.52649 21.4142 7.8703C21.7893 8.21412 22 8.68044 22 9.16667V11C22 11.2383 21.95 11.4583 21.86 11.6692L18.84 18.1317C18.54 18.7917 17.83 19.25 17 19.25H8ZM8 17.4167H17.03L20 11V9.16667H11.21L12.34 4.29L8 8.2775V17.4167Z" fill="url(#paint0_linear_like_outlined__nav)"/>
+</g>
+<defs>
+<linearGradient id="paint0_linear_like_outlined__nav" x1="11" y1="3.03205" x2="11" y2="17.1346" gradientUnits="userSpaceOnUse">
+<stop stop-color="#C6C6C6"/>
+<stop offset="1" stop-color="#C8C8C8"/>
+</linearGradient>
+</defs>
+</svg>

@@ -1,0 +1,12 @@
+<svg width="26" height="26" viewBox="0 0 26 26" fill="none" xmlns="http://www.w3.org/2000/svg">
+<g id="icon-delete">
+<circle id="Circle" cx="13" cy="13" r="12.75" fill="url(#paint0_linear_delete)" stroke="#E1554D" stroke-width="0.5"/>
+<rect id="Line" x="7" y="11" width="12" height="3" fill="white"/>
+</g>
+<defs>
+<linearGradient id="paint0_linear_delete" x1="13" y1="0" x2="13" y2="26" gradientUnits="userSpaceOnUse">
+<stop stop-color="#E5645A"/>
+<stop offset="1" stop-color="#E55F55"/>
+</linearGradient>
+</defs>
+</svg>

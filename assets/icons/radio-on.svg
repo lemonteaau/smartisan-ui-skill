@@ -1,0 +1,37 @@
+<svg width="22" height="22" viewBox="0 0 22 22" fill="none" xmlns="http://www.w3.org/2000/svg">
+<g id="Radio Button">
+<g id="Outter" filter="url(#filter0_i_radio_on)">
+<circle cx="11" cy="11" r="11" fill="#ECECEC"/>
+</g>
+<g id="Inner" filter="url(#filter1_d_radio_on)">
+<circle cx="11" cy="11" r="5" fill="url(#paint0_linear_radio_on)"/>
+<circle cx="11" cy="11" r="4.8" stroke="#5671C9" stroke-width="0.4"/>
+</g>
+</g>
+<defs>
+<filter id="filter0_i_radio_on" x="0" y="0" width="22" height="22" filterUnits="userSpaceOnUse" color-interpolation-filters="sRGB">
+<feFlood flood-opacity="0" result="BackgroundImageFix"/>
+<feBlend mode="normal" in="SourceGraphic" in2="BackgroundImageFix" result="shape"/>
+<feColorMatrix in="SourceAlpha" type="matrix" values="0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 127 0" result="hardAlpha"/>
+<feOffset/>
+<feGaussianBlur stdDeviation="1"/>
+<feComposite in2="hardAlpha" operator="arithmetic" k2="-1" k3="1"/>
+<feColorMatrix type="matrix" values="0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0.08 0"/>
+<feBlend mode="normal" in2="shape" result="effect1_innerShadow_radio_on"/>
+</filter>
+<filter id="filter1_d_radio_on" x="2" y="4" width="18" height="18" filterUnits="userSpaceOnUse" color-interpolation-filters="sRGB">
+<feFlood flood-opacity="0" result="BackgroundImageFix"/>
+<feColorMatrix in="SourceAlpha" type="matrix" values="0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 127 0" result="hardAlpha"/>
+<feOffset dy="2"/>
+<feGaussianBlur stdDeviation="2"/>
+<feComposite in2="hardAlpha" operator="out"/>
+<feColorMatrix type="matrix" values="0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0.06 0"/>
+<feBlend mode="normal" in2="BackgroundImageFix" result="effect1_dropShadow_radio_on"/>
+<feBlend mode="normal" in="SourceGraphic" in2="effect1_dropShadow_radio_on" result="shape"/>
+</filter>
+<linearGradient id="paint0_linear_radio_on" x1="11" y1="6" x2="11" y2="16" gradientUnits="userSpaceOnUse">
+<stop stop-color="#95AFE5"/>
+<stop offset="1" stop-color="#6889DA"/>
+</linearGradient>
+</defs>
+</svg>

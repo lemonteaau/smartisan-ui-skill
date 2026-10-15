@@ -1,0 +1,535 @@
+/* ==========================================================================
+   Smartisan OS UI — CSS tokens + components (complete kit)
+   Source: Figma Community "Smartisan OS UI Kit (Unofficial)" by Paix Chan (CC BY 4.0)
+           https://www.figma.com/community/file/1419385240874679870
+           — based on Smartisan OS 8 on Smartisan R2; cross-checked on a real R2.
+   Every value below was read from the Figma nodes; the comment after a rule
+   names the Figma component it reproduces. See references/inventory.md.
+
+   Usage:  <link rel="stylesheet" href="smartisan.css">, put class="s-page" on
+           <body>, inline icons-sprite.svg, then use the .s-* classes.
+   State:  every pressable component styles :active AND .is-pressed, so you can
+           render a static "pressed" sample. Disabled = :disabled or
+           [aria-disabled="true"]. Selected = :checked / aria-selected /
+           aria-pressed / aria-current as noted per component.
+   ========================================================================== */
+
+:root {
+  /* ---------- Figma variables: Grey/* ---------- */
+  --s-white: #ffffff;      /* Grey/white */
+  --s-grey-100: #fafafa;   /* Grey/100  = Background/Container/Miscellaneous */
+  --s-grey-200: #f2f2f2;   /* Grey/200  = Divider */
+  --s-grey-300: #eeeeee;   /* Grey/300  = Border/Button */
+  --s-grey-400: #e2e2e2;   /* Grey/400  = Border/List */
+  --s-grey-500: #bababa;   /* Grey/500  = Disabled */
+  --s-grey-600: #9d9d9d;   /* Grey/600  = Subtitle/Other */
+  --s-grey-700: #7f7f7f;   /* Grey/700  = Subtitle/List */
+  --s-grey-800: #636363;   /* Grey/800  = Title/Other */
+  --s-grey-900: #333333;   /* Grey/900  = Title/List */
+
+  /* ---------- Figma variables: Blue/* ---------- */
+  --s-blue-100: #e7edfd;   /* Blue/100 — icon button bg */
+  --s-blue-300: #5985eb;   /* Blue/300 — pressed list row */
+  --s-blue-400: #5079d9;   /* Blue/400 — text button */
+  --s-blue-500: #3f68e2;   /* Blue/500 — primary border */
+  --s-blue-600: #2f54d7;   /* Blue/600 — primary pressed border */
+
+  /* ---------- Figma variables: semantic ---------- */
+  --s-title-list: var(--s-grey-900);
+  --s-subtitle-list: var(--s-grey-700);
+  --s-title-other: var(--s-grey-800);
+  --s-subtitle-other: var(--s-grey-600);
+  --s-disabled: var(--s-grey-500);
+  --s-divider-color: var(--s-grey-200);
+  --s-border-list: var(--s-grey-400);
+  --s-border-button: var(--s-grey-300);
+  --s-container-misc: var(--s-grey-100);
+  --s-btn-primary-pressed: #4772e6;  /* Background/Button/Primary/Pressed */
+  --s-dialog-action-text: #5e80d0;   /* Dialog/Action */
+  --s-dialog-action: #f7f7f7;        /* Miscellaneous/Backgound-DialogAction/Enabled */
+  --s-dialog-action-pressed: #dfdfdf;/* Miscellaneous/Backgound-DialogAction/Pressed */
+  --s-red-stroke: #da463e;           /* Red/Button-Stroke-Enabled */
+  --s-board: #f5f5f5;                /* ComponentBoard/SectionFill (= page bg) */
+  --s-board-stroke: #9a9a9a;         /* ComponentBoard/ComponentSetStroke */
+
+  /* ---------- Figma paint styles (gradients, top → bottom) ---------- */
+  --s-grad-primary: linear-gradient(180deg, #5b87eb, #5883eb);         /* Background/Button/Primary/Enabled */
+  --s-grad-primary-sm-disabled: linear-gradient(180deg, #628cec, #517ce8);
+  --s-grad-white: linear-gradient(180deg, #ffffff, #fcfcfc);           /* Background/Button/White/Enabled */
+  --s-grad-white-pressed: linear-gradient(180deg, #ebebeb, #f2f2f2);   /* Background/Button/White/Pressed */
+  --s-grad-red: linear-gradient(180deg, #e5645a, #e55f55);             /* Background/Button/Red/Enabled */
+  --s-grad-icon: linear-gradient(180deg, #8c8c8c, #989898);            /* Fill/Icon/Enabled */
+  --s-grad-icon-disabled: linear-gradient(180deg, #c6c6c6, #c8c8c8);   /* Fill/Icon/Disabled */
+  --s-grad-appbar-red: linear-gradient(180deg, #cd3f3a, #c83530);
+  --s-grad-segment: linear-gradient(180deg, #4878f0, #6997f4);
+  --s-grad-sheet-header: linear-gradient(180deg, #ffffff, #fafafa);
+  --s-grad-toast: linear-gradient(180deg, #fcf6e6, #fcf3dc);
+  --s-grad-slider-fill: linear-gradient(0deg, #7ca3fb, #668ff7);
+  --s-grad-switch-dot: linear-gradient(180deg, #9cbcff, #7da7ff);
+  --s-grad-radio-on: linear-gradient(180deg, #95afe5, #6889da);
+  --s-grad-radio-off: linear-gradient(180deg, #fbfbfb, #f1f1f1);
+  --s-grad-picker-body: linear-gradient(180deg, #ededed 0%, #f1f1f1 14%, #ededed 100%);
+  --s-grad-picker-well: linear-gradient(180deg, #fefefe 40.5%, #e2e2e3 100%);
+  --s-grad-picker-band: linear-gradient(180deg, #ffffff 0%, #f5f5f5 53.5%, #f8f8f8 100%);
+  --s-grad-kit-header: linear-gradient(90deg, #222325 0%, #3b3c3f 49%, #222325 100%);
+
+  /* ---------- Other surfaces / text ---------- */
+  --s-page: var(--s-board);
+  --s-sheet-body: #efefef;
+  --s-overlay: rgba(0, 0, 0, 0.6);
+  --s-appbar-border: #d8d8d8;
+  --s-appbar-red-border: #b7241f;
+  --s-dialog-header-border: #ededed;
+  --s-dialog-action-border: #e8e8e8;
+  --s-dialog-action-border-pressed: #d5d5d5;
+  --s-text-body: #656565;      /* dialog paragraph, sheet/picker title */
+  --s-text-desc: #797979;      /* list footer description */
+  --s-text-simple-dialog: #898989;
+  --s-text-tile3: #787878;
+  --s-placeholder: #d9d9d9;
+  --s-icon: #929292;           /* solid stand-in for --s-grad-icon */
+  --s-icon-disabled: #c7c7c7;  /* solid stand-in for --s-grad-icon-disabled */
+  --s-icon-chevron: #b2b2b2;
+  --s-icon-more: #bababa;
+  --s-icon-blue: #5c89f2;
+  --s-icon-check-blue: #6190ff;
+  --s-icon-add: #c9cbcf;
+
+  /* ---------- Radii ---------- */
+  --s-r-segment: 3px;
+  --s-r-sm: 4px;        /* button/radius/small */
+  --s-r-md: 6px;
+  --s-r-sheet-btn: 8px;
+  --s-r-lg: 10px;       /* button-radius */
+  --s-r-dialog: 12px;
+  --s-r-sheet: 20px;
+  --s-r-kit: 40px;      /* kit documentation boards */
+  --s-r-pill: 100px;
+
+  /* ---------- Hairlines ---------- */
+  --s-hair-xs: 0.4px;
+  --s-hair-sm: 0.5px;
+  --s-hair: 0.8px;
+
+  /* ---------- Shadows ---------- */
+  --s-shadow-btn: 0 4px 2px rgba(0, 0, 0, 0.10);            /* drop-shadow on elevated button */
+  --s-shadow-card: 0 10px 16px rgba(0, 0, 0, 0.04);         /* list card */
+  --s-shadow-card-sm: 0 2px 6px rgba(0, 0, 0, 0.06);        /* slide bar card */
+  --s-shadow-dialog-actions: 0 4px 2.1px rgba(0, 0, 0, 0.07);
+  --s-shadow-bar: 0 4px 4px rgba(0, 0, 0, 0.08);            /* search bar */
+  --s-shadow-knob: 0 5px 16.6px rgba(0, 0, 0, 0.21);        /* 80px rounded button */
+  --s-shadow-knob-sm: 0 4px 4px rgba(0, 0, 0, 0.12);        /* 28px rounded button */
+  --s-shadow-thumb: 0 4px 4px rgba(0, 0, 0, 0.08);          /* switch thumb */
+  --s-shadow-slider-thumb: 0 4px 8px rgba(0, 0, 0, 0.16);
+  --s-shadow-radio-dot: 0 2px 4px rgba(0, 0, 0, 0.06);
+  --s-inset-track: inset 0 4px 4px rgba(0, 0, 0, 0.06);
+  --s-inset-switch: inset 0 4px 12px rgba(0, 0, 0, 0.10);
+  --s-inset-well: inset 0 4px 12px rgba(0, 0, 0, 0.18);
+  --s-inset-field: inset 0 4px 4px rgba(0, 0, 0, 0.04);     /* Shadow/textfield-inner */
+  --s-inset-tab: inset 0 4px 10px rgba(0, 0, 0, 0.06);
+  --s-inset-swipe: inset 0 0 4px rgba(0, 0, 0, 0.16);
+  --s-inset-radio: inset 0 0 2px rgba(0, 0, 0, 0.08);
+
+  /* ---------- Type ---------- */
+  /* Real device (Smartisan OS 8.5.3 on R2): Latin = Smartisan Compact, CJK = Noto Sans CJK SC.
+     The Figma kit substitutes Inter. Smartisan Compact is proprietary — only used if installed. */
+  --s-font: "Smartisan Compact", "Inter", -apple-system, BlinkMacSystemFont, "Noto Sans CJK SC",
+            "Source Han Sans SC", "Noto Sans SC", "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei",
+            "Helvetica Neue", Arial, sans-serif;
+
+  /* ---------- Measured on a real Smartisan R2 (not in the Figma kit) ---------- */
+  --s-page-real: #f0f0f0;                 /* real Settings page base */
+  --s-page-texture: repeating-linear-gradient(90deg, #f0f0f0 0 3.6px, #eeeeee 3.6px 7.2px); /* vertical pinstripes */
+  --s-appbar-shadow: linear-gradient(180deg, rgba(0, 0, 0, 0.045), rgba(0, 0, 0, 0)); /* 8px fade under app bar */
+  --s-icon-list-light: #cdcdcf;           /* leading icons in real Settings rows */
+
+  /* ---------- Layout ---------- */
+  --s-screen: 432px;      /* R2: 1080px / density 400 (2.5x) = 432dp */
+}
+
+/* ======================= Base ======================= */
+.s-root, .s-page {
+  font-family: var(--s-font); color: var(--s-grey-900);
+  -webkit-font-smoothing: antialiased; -webkit-tap-highlight-color: transparent;
+}
+.s-page { background: var(--s-page); min-height: 100%; }
+/* Real-device look: pinstriped background as on Smartisan OS Settings (optional) */
+.s-page--textured { background: var(--s-page-texture); }
+.s-root *, .s-page *, .s-root *::before, .s-page *::before, .s-root *::after, .s-page *::after { box-sizing: border-box; }
+
+.s-icon { width: 24px; height: 24px; flex: none; color: var(--s-icon); display: inline-block; vertical-align: middle; }
+.s-icon--16 { width: 16px; height: 16px; }
+.s-icon--18 { width: 18px; height: 18px; }
+.s-icon--20 { width: 20px; height: 20px; }
+.s-icon--22 { width: 22px; height: 22px; }
+.s-icon--28 { width: 28px; height: 28px; }
+
+/* Divider (173:1303) · Vertical Divider (197:1228) · Divider-Short (208:1274) */
+.s-divider { display: block; height: var(--s-hair); background: var(--s-divider-color); border: 0; margin: 0; }
+.s-divider--v { width: 1px; height: 54px; }
+.s-divider--short { width: var(--s-hair); height: 12px; background: var(--s-grey-300); }
+
+/* ======================= App Bar (40:887) ======================= */
+.s-appbar {
+  position: relative; display: flex; align-items: center; gap: 4px;
+  height: 48px; padding: 8px 14px; background: var(--s-white); border-bottom: 1px solid var(--s-appbar-border);
+}
+.s-appbar__title {
+  position: absolute; left: 50%; top: calc(50% - 0.5px); transform: translate(-50%, -50%);
+  font-size: 16px; font-weight: 700; color: var(--s-title-other); white-space: nowrap; pointer-events: none;
+}
+.s-appbar__spacer { flex: 1; }
+.s-appbar__actions { display: flex; align-items: center; gap: 18px; }
+.s-appbar > button, .s-appbar__actions > button:not(.s-btn-icon) { all: unset; cursor: pointer; display: inline-flex; color: var(--s-icon); }
+.s-appbar--red { background: var(--s-grad-appbar-red); border-bottom-color: var(--s-appbar-red-border); }
+/* Real device: the app bar casts an 8px soft fade onto the page (optional) */
+.s-appbar--shadow { z-index: 2; }
+.s-appbar--shadow::after { content: ""; position: absolute; left: 0; right: 0; top: 100%; height: 8px; background: var(--s-appbar-shadow); pointer-events: none; }
+/* Real-device Settings style: lighter leading icons in list rows (optional) */
+.s-list--light-icons .s-list-item > .s-icon:first-child { color: var(--s-icon-list-light); }
+.s-appbar--red .s-appbar__title, .s-appbar--red > button, .s-appbar--red .s-appbar__actions > button, .s-appbar--red .s-icon { color: var(--s-white); }
+
+/* ======================= Buttons ======================= */
+/* Elevated Button (18:7) — large 408×60 */
+.s-btn {
+  appearance: none; cursor: pointer; font-family: var(--s-font);
+  display: inline-flex; align-items: center; justify-content: center;
+  height: 60px; padding: 0 22px; min-width: 120px;
+  font-size: 16px; font-weight: 700; line-height: 1; color: var(--s-white);
+  background: var(--s-grad-primary); border: var(--s-hair) solid var(--s-blue-500); border-radius: var(--s-r-lg);
+  filter: drop-shadow(var(--s-shadow-btn));
+}
+.s-btn--block { display: flex; width: 100%; }
+.s-btn:active, .s-btn.is-pressed { background: var(--s-btn-primary-pressed); border-color: var(--s-blue-600); }
+.s-btn:disabled, .s-btn[aria-disabled="true"] { opacity: 0.3; cursor: default; background: var(--s-grad-primary); border-color: var(--s-blue-500); }
+
+/* Small Elevated Button (147:413) — 30px */
+.s-btn--sm { height: 30px; min-width: 0; padding: 8px 12px; font-size: 14px; border-width: var(--s-hair-xs); border-radius: var(--s-r-sm); filter: none; }
+.s-btn--sm:disabled, .s-btn--sm[aria-disabled="true"] { background: var(--s-grad-primary-sm-disabled); border-color: #2c50cf; }
+
+/* BottomSheet Button (27:138) — white 392×48 */
+.s-btn--sheet { height: 48px; color: var(--s-title-other); background: var(--s-white); border: var(--s-hair) solid var(--s-border-button); border-radius: var(--s-r-sheet-btn); filter: none; }
+.s-btn--sheet:active, .s-btn--sheet.is-pressed { background: #f8f8f8; border-color: var(--s-border-button); }
+
+/* Outlined Button (26:13) — 94×30 */
+.s-btn--outline { height: 30px; min-width: 0; padding: 8px 28px; font-size: 14px; color: #606060; background: transparent; border: var(--s-hair-sm) solid #d3d3d3; border-radius: var(--s-r-sm); filter: none; }
+.s-btn--outline:active, .s-btn--outline.is-pressed { background: var(--s-grey-200); border-color: #d3d3d3; }
+
+/* Text Button (147:270) — 12px Blue/400 */
+.s-btn--text { height: auto; min-width: 0; padding: 0; font-size: 12px; font-weight: 400; color: var(--s-blue-400); background: none; border: 0; filter: none; }
+.s-btn--text:active, .s-btn--text.is-pressed { background: none; opacity: 0.6; }
+
+/* Icon Button (40:1028) — 38×30 */
+.s-btn-icon {
+  appearance: none; cursor: pointer; display: inline-flex; align-items: center; justify-content: center;
+  height: 30px; padding: 6px 10px; border: 0; border-radius: var(--s-r-md); background: var(--s-blue-100); color: var(--s-icon-blue);
+}
+.s-btn-icon .s-icon { width: 18px; height: 18px; color: inherit; }
+.s-btn-icon:active, .s-btn-icon.is-pressed { filter: brightness(0.95); }
+
+/* Rounded Button (20:5) — knob in a recess; large 80, small 28 */
+.s-round-btn {
+  appearance: none; cursor: pointer; position: relative; border: 0; padding: 0; flex: none;
+  width: 80px; height: 80px; border-radius: 50%; background: #ededed;
+  display: inline-flex; align-items: center; justify-content: center; color: var(--s-icon);
+}
+.s-round-btn::before {
+  content: ""; position: absolute; inset: 6px; border-radius: 50%;
+  background: var(--s-grad-white); border: var(--s-hair-xs) solid var(--s-grey-300); box-shadow: var(--s-shadow-knob);
+}
+.s-round-btn > * { position: relative; }
+/* si-play path bbox is 16.5×19.5 in a 24 viewBox, already shifted +3.25 right (optical centring).
+   28px → triangle 19.25×22.75, bbox +3.8px right, centroid ≈ circle centre — exactly as Figma 19:30. */
+.s-round-btn .s-icon { width: 28px; height: 28px; }
+.s-round-btn:active::before, .s-round-btn.is-pressed::before { background: var(--s-grad-white-pressed); }
+.s-round-btn--sm { width: 28px; height: 28px; background: #f5f5f5; }
+.s-round-btn--sm::before { inset: 2.33px; box-shadow: var(--s-shadow-knob-sm); }
+.s-round-btn--sm .s-icon { width: 10px; height: 10px; } /* triangle 6.9×8.1, +1.35px — Figma 24:58 */
+
+/* Segmented Button (26:83 bar, 208:1263 item) — 60px; selected = blue 30px block.
+   NB: in Figma the item variants are mislabeled (the blue block is "Selected=False"). */
+.s-segmented { display: flex; align-items: center; height: 60px; background: var(--s-white); }
+.s-segmented > button {
+  all: unset; cursor: pointer; box-sizing: border-box; width: 100px; height: 100%; flex: none;
+  display: flex; align-items: center; justify-content: center; position: relative;
+  font-family: var(--s-font); font-size: 14px; font-weight: 700; color: var(--s-title-other);
+}
+.s-segmented--fill > button { flex: 1; width: auto; }
+.s-segmented > button + button::before {
+  content: ""; position: absolute; left: 0; top: 50%; height: 12px; width: var(--s-hair);
+  transform: translateY(-50%); background: var(--s-grey-300);
+}
+.s-segmented > button > span { display: inline-flex; align-items: center; height: 30px; padding: 6px 12px; border-radius: var(--s-r-segment); border: var(--s-hair) solid transparent; }
+.s-segmented > button[aria-pressed="true"] > span { color: var(--s-white); background: var(--s-grad-segment); border-color: #3d6fee; }
+
+/* Tabs (179:3017) / Tab (203:1864) — 28.8px compact segmented control */
+.s-tabs { display: inline-flex; height: 28.8px; overflow: hidden; border: var(--s-hair-xs) solid var(--s-grey-400); border-radius: var(--s-r-md); }
+.s-tabs > button {
+  all: unset; cursor: pointer; box-sizing: border-box; width: 60px; height: 100%; text-align: center; line-height: 28px;
+  font-family: var(--s-font); font-size: 12px; font-weight: 700; color: var(--s-title-other);
+  background: var(--s-white); border-right: var(--s-hair-sm) solid var(--s-grey-200);
+}
+.s-tabs > button:last-child { border-right: 0; }
+.s-tabs > button[aria-selected="true"] { color: var(--s-white); background: #b2b2b2; box-shadow: var(--s-inset-tab), inset 0 0 0 var(--s-hair-xs) #a7a7a7; border-right-color: transparent; }
+
+/* ======================= Chip (253:2478) ======================= */
+/* colours: default(White) | --yellow | --blue | --red | --grey ; layout: default(None) | --all | --leading | --trailing */
+.s-chip {
+  appearance: none; cursor: pointer; font-family: var(--s-font);
+  display: inline-flex; align-items: center; justify-content: center; gap: 4px;
+  height: 30px; min-height: 30px; min-width: 60px; padding: 6px 16px; overflow: hidden; border-radius: var(--s-r-pill);
+  font-size: 12px; font-weight: 600; line-height: 1; white-space: nowrap;
+  color: #646464; background: var(--s-grey-100); border: var(--s-hair-xs) solid #cecece;
+}
+.s-chip .s-icon { width: 20px; height: 20px; color: currentColor; }
+.s-chip--all { padding: 6px 0 6px 4px; }
+.s-chip--leading { padding: 6px 16px 6px 4px; }
+.s-chip--trailing { padding: 6px 0 6px 16px; }
+.s-chip:active, .s-chip.is-pressed { background: linear-gradient(180deg, #e9e9e9, #ececec); border-color: #bfbfbf; }
+.s-chip--yellow { color: #cd9143; background: #fff5d9; border-color: #ccb08c; }
+.s-chip--yellow:active, .s-chip--yellow.is-pressed { background: linear-gradient(180deg, #f2e9d1, #f2e8c9); border-color: #c5aa87; }
+.s-chip--blue { color: #6393ff; background: var(--s-white); border-color: #93b2f7; }
+.s-chip--blue:active, .s-chip--blue.is-pressed { background: linear-gradient(180deg, #e6efff, #e1ecff); border-color: #93b2f7; }
+.s-chip--red { color: #cc3e39; background: #ffe7e5; border-color: #eb7f77; }
+.s-chip--red:active, .s-chip--red.is-pressed { background: linear-gradient(180deg, #f2dcda, #f2d8d6); border-color: #f0948d; }
+.s-chip--grey { color: #646464; background: #f0f0f0; border-color: #dadada; }
+.s-chip--grey:active, .s-chip--grey.is-pressed { background: linear-gradient(180deg, #e9e9e9, #ececec); border-color: #bfbfbf; }
+
+/* ======================= List (248:872) ======================= */
+.s-list-group { display: flex; flex-direction: column; gap: 4px; }
+.s-list-group__body { display: flex; flex-direction: column; gap: 6px; }
+.s-list-group__header { padding: 0 16px; font-size: 14px; font-weight: 600; color: var(--s-subtitle-list); }
+.s-list-group__desc { text-align: center; font-size: 14px; line-height: 1; color: var(--s-text-desc); }
+.s-list {
+  margin: 0; padding: 0; list-style: none; overflow: hidden; background: var(--s-white);
+  border: var(--s-hair) solid var(--s-border-list); border-radius: var(--s-r-lg); box-shadow: var(--s-shadow-card);
+}
+.s-list--flush { border-radius: 0; border-left: 0; border-right: 0; box-shadow: none; }
+
+/* List Tile (253:1305) — 60px; Enabled / Pressed / Disabled */
+.s-list-item {
+  all: unset; box-sizing: border-box; width: 100%; position: relative;
+  display: flex; align-items: center; gap: 18px; min-height: 60px; padding: 0 12px 0 18px;
+  font-family: var(--s-font); background: var(--s-white); color: var(--s-title-list);
+}
+.s-list > .s-list-item:not(:last-child), .s-list-item--divider { box-shadow: inset 0 calc(-1 * var(--s-hair)) 0 var(--s-divider-color); }
+.s-list-item > .s-icon:first-child { width: 20px; height: 20px; }
+.s-list-item__text { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 4px; }
+.s-list-item__title { font-size: 16px; color: var(--s-title-list); }
+.s-list-item__subtitle { font-size: 12px; color: var(--s-subtitle-list); }
+/* List Item Detail (253:1360) */
+.s-list-item__detail { display: flex; align-items: center; font-size: 16px; color: var(--s-subtitle-list); white-space: nowrap; }
+.s-list-item__detail .s-icon { color: var(--s-icon-chevron); }
+a.s-list-item, button.s-list-item, .s-list-item[data-pressable] { cursor: pointer; }
+a.s-list-item:active, button.s-list-item:active, .s-list-item[data-pressable]:active, .s-list-item.is-pressed {
+  background: var(--s-blue-300); box-shadow: inset 0 0 0 var(--s-hair-xs) var(--s-blue-500);
+}
+a.s-list-item:active *, button.s-list-item:active *, .s-list-item[data-pressable]:active *, .s-list-item.is-pressed * { color: var(--s-white) !important; }
+.s-list-item[aria-disabled="true"] { pointer-events: none; }
+.s-list-item[aria-disabled="true"], .s-list-item[aria-disabled="true"] * { color: var(--s-disabled) !important; }
+.s-list-item[aria-disabled="true"] .s-icon { color: var(--s-icon-disabled) !important; }
+
+/* List Tile 2 (253:2000) — title 18 + right-aligned 14px detail */
+.s-list-item--simple { gap: 18.4px; padding: 0 11.2px 0 18.4px; }
+.s-list-item--simple .s-list-item__title { font-size: 18px; color: #333; white-space: nowrap; }
+.s-list-item--simple .s-list-item__detail { flex: 1; justify-content: flex-end; font-size: 14px; color: var(--s-subtitle-other); }
+
+/* List Tile 3 (211:1303) — transparent, grey text, 0.5px #ddd rule */
+.s-list-item--plain { background: transparent; padding: 0 18px; flex-direction: column; align-items: stretch; gap: 0; }
+.s-list-item--plain .s-list-item__text { height: 60px; justify-content: center; color: var(--s-text-tile3); }
+.s-list-item--plain .s-list-item__title { font-size: 14px; color: var(--s-text-tile3); }
+.s-list-item--plain .s-list-item__subtitle { font-size: 12px; color: var(--s-text-tile3); }
+.s-list-item--plain::after { content: ""; display: block; height: 0.5px; background: #ddd; }
+
+/* Slidable List Tile (211:1357) — row slid left reveals an inset action tray */
+.s-swipe { display: flex; overflow: hidden; width: 100%; }
+.s-swipe__actions {
+  flex: none; display: flex; align-items: center; gap: 20px; padding: 16px;
+  background: rgba(255, 255, 255, 0.01); border: var(--s-hair-sm) solid #c7c7c7; box-shadow: var(--s-inset-swipe);
+}
+.s-swipe__actions > button { all: unset; cursor: pointer; display: inline-flex; color: var(--s-icon); }
+.s-swipe > .s-list-item { flex: none; width: 100%; border: 1px solid var(--s-grey-400); gap: 18.4px; padding: 0 11.2px 0 18.4px; }
+
+/* ======================= Switch (42:1333) — <input type=checkbox> ======================= */
+.s-switch {
+  appearance: none; -webkit-appearance: none; margin: 0; cursor: pointer; flex: none;
+  position: relative; width: 52px; height: 24px; border-radius: var(--s-r-pill);
+  background: var(--s-white); border: var(--s-hair-xs) solid var(--s-grey-400); box-shadow: var(--s-inset-switch);
+}
+.s-switch::after { /* indicator dot: grey right when off, blue left when on */
+  content: ""; position: absolute; top: 50%; left: 34.5px; width: 9.6px; height: 9.6px; margin-top: -4.8px;
+  border-radius: 50%; background: #f4f4f4; border: var(--s-hair-xs) solid #e8e8e8;
+}
+.s-switch:checked::after { left: 7.9px; background: var(--s-grad-switch-dot); border-color: #769dfe; }
+.s-switch::before { /* thumb: left when off, right when on */
+  content: ""; position: absolute; top: -0.4px; left: -0.4px; width: 24px; height: 24px; border-radius: 50%; z-index: 1;
+  background: var(--s-grad-white); border: var(--s-hair-xs) solid var(--s-grey-400); box-shadow: var(--s-shadow-thumb);
+  transition: left 0.18s ease;
+}
+.s-switch:checked::before { left: calc(100% - 23.6px); }
+.s-switch:disabled { opacity: 0.4; cursor: default; }
+
+/* ======================= Radio (171:398) — <input type=radio> ======================= */
+.s-radio {
+  appearance: none; -webkit-appearance: none; margin: 0; cursor: pointer; flex: none; position: relative;
+  width: 22px; height: 22px; border-radius: 50%; background: #ececec; box-shadow: var(--s-inset-radio);
+}
+.s-radio::after {
+  content: ""; position: absolute; inset: 6px; border-radius: 50%;
+  background: var(--s-grad-radio-off); border: var(--s-hair-xs) solid #ececec; box-shadow: var(--s-shadow-radio-dot);
+}
+.s-radio:checked::after { background: var(--s-grad-radio-on); border-color: #5671c9; }
+/* Radio List Item (171:369) — 48px + 0.8px divider */
+.s-radio-item { display: flex; align-items: center; height: 48px; padding: 0 16px; font-size: 14px; color: var(--s-title-list); background: var(--s-white); cursor: pointer; }
+.s-radio-item > span { flex: 1; }
+.s-radio-item + .s-radio-item { box-shadow: inset 0 var(--s-hair) 0 var(--s-divider-color); }
+.s-radio-item:last-child { box-shadow: inset 0 calc(-1 * var(--s-hair)) 0 var(--s-divider-color); }
+.s-radio-item + .s-radio-item:last-child { box-shadow: inset 0 var(--s-hair) 0 var(--s-divider-color), inset 0 calc(-1 * var(--s-hair)) 0 var(--s-divider-color); }
+
+/* ======================= Dialog (248:871) ======================= */
+.s-overlay { position: fixed; inset: 0; z-index: 100; display: flex; align-items: center; justify-content: center; padding: 32px; background: var(--s-overlay); }
+.s-overlay--inline { position: relative; inset: auto; z-index: auto; }
+.s-dialog { width: 368px; max-width: 100%; display: flex; flex-direction: column; font-family: var(--s-font); }
+.s-dialog.is-pressed { opacity: 0.9; }
+.s-dialog.is-pressed .s-dialog__body { color: var(--s-title-other); }
+/* Dialog Header (171:272) */
+.s-dialog__header {
+  height: 48px; display: flex; align-items: center; justify-content: center; overflow: hidden;
+  background: var(--s-container-misc); border-bottom: 1px solid var(--s-dialog-header-border);
+  border-radius: var(--s-r-dialog) var(--s-r-dialog) 0 0; font-size: 18px; font-weight: 700; color: var(--s-title-other);
+}
+.s-dialog__body { padding: 20px; background: var(--s-white); font-size: 16px; line-height: 24px; color: var(--s-text-body); }
+.s-dialog__body:first-child { border-radius: var(--s-r-dialog) var(--s-r-dialog) 0 0; }
+.s-dialog__body--flush { padding: 0; }
+.s-dialog__body--field { padding: 24px 18px; }   /* TextField Dialog (195:1211) */
+/* Dialog Action Group (253:1210): 1, 2 or 3 actions; primary is rightmost */
+.s-dialog__actions { display: flex; overflow: hidden; border-radius: 0 0 var(--s-r-dialog) var(--s-r-dialog); filter: drop-shadow(var(--s-shadow-dialog-actions)); }
+/* Dialog Action Button (253:1049) */
+.s-dialog__actions > button {
+  all: unset; cursor: pointer; box-sizing: border-box; flex: 1; height: 54px; text-align: center; line-height: 53px;
+  font-family: var(--s-font); font-size: 14px; font-weight: 700; color: var(--s-title-other);
+  background: var(--s-dialog-action); border-top: var(--s-hair) solid var(--s-dialog-action-border);
+}
+.s-dialog__actions > button + button { box-shadow: inset 1px 0 0 var(--s-divider-color); }
+.s-dialog__actions > button[data-primary] { color: var(--s-dialog-action-text); }
+.s-dialog__actions > button:active, .s-dialog__actions > button.is-pressed { background: var(--s-dialog-action-pressed); }
+.s-dialog__actions > button[data-primary]:active, .s-dialog__actions > button[data-primary].is-pressed { border-top-color: var(--s-dialog-action-border-pressed); }
+/* Simple Dialog (40:1064) — no header/actions, dismiss by tapping scrim */
+.s-dialog--simple { width: 376px; padding: 40px 28px; background: var(--s-white); border-radius: var(--s-r-dialog); font-size: 12px; line-height: 28px; color: var(--s-text-simple-dialog); }
+
+/* Text Field — Size=Narrow (172:455, "Be used in dialog") */
+.s-textfield {
+  width: 100%; height: 34px; padding: 0 12px; font-family: var(--s-font); font-size: 14px; color: var(--s-title-list);
+  background: var(--s-white); border: var(--s-hair) solid var(--s-border-list); border-radius: var(--s-r-md);
+  box-shadow: var(--s-inset-field); outline: none;
+}
+.s-textfield::placeholder { color: var(--s-placeholder); }
+.s-textfield:focus { border-color: #93b2f7; }
+
+/* ======================= Bottom Sheet (253:838) ======================= */
+.s-sheet { width: 100%; display: flex; flex-direction: column; overflow: hidden; font-family: var(--s-font); }
+/* Bottom Sheet Header (204:1173): leading ×, centered title, trailing ✓ (each optional) */
+.s-sheet__header {
+  position: relative; display: flex; align-items: center; justify-content: space-between; gap: 0;
+  height: 48px; padding: 14px 13px; background: var(--s-grad-sheet-header);
+  border-bottom: 1px solid var(--s-border-list); border-radius: var(--s-r-sheet) var(--s-r-sheet) 0 0;
+}
+.s-sheet__header > .s-sheet__spacer { flex: 1; }
+.s-sheet__title {
+  position: absolute; left: calc(50% + 0.5px); top: 50%; transform: translate(-50%, -50%);
+  font-size: 14px; font-weight: 700; color: var(--s-text-body); white-space: nowrap;
+}
+.s-sheet__header button { all: unset; cursor: pointer; display: inline-flex; color: var(--s-icon); }
+.s-sheet__body { display: flex; flex-direction: column; align-items: stretch; gap: 20px; padding: 22px 20px 40px; background: var(--s-sheet-body); }
+
+/* ======================= Date / Time Picker (147:276, 147:390) ======================= */
+.s-picker { display: flex; flex-direction: column; height: 274px; overflow: hidden; font-family: var(--s-font); }
+.s-picker__body { flex: 1; display: flex; padding: 0 12px 18px; background: var(--s-grad-picker-body); }
+.s-picker__well {
+  flex: 1; position: relative; display: flex; overflow: hidden;
+  border: 1px solid #c6c6c8; border-radius: var(--s-r-md); background: var(--s-grad-picker-well);
+}
+.s-picker__well::after { content: ""; position: absolute; inset: 0; pointer-events: none; border-radius: inherit; box-shadow: var(--s-inset-well); }
+.s-picker__band { position: absolute; left: -1px; right: -1px; top: 81px; height: 44px; background: var(--s-grad-picker-band); border: 1px solid #d9d9d9; }
+.s-picker__col {
+  flex: 1; position: relative; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 16px;
+  padding: 14px 0; font-size: 16px; text-align: center; color: #b3b3b5; border-right: 1px solid rgba(206, 206, 206, 0.4);
+}
+.s-picker__col:last-child { border-right: 0; }
+.s-picker__col > * { flex: 1; display: flex; align-items: center; justify-content: center; min-height: 0; }
+.s-picker__col > [aria-selected="true"] { flex: none; height: 38px; color: #55585c; }
+
+/* ======================= Popup Menu (249:1126) ======================= */
+.s-menu { width: 220px; overflow: hidden; background: var(--s-white); border: var(--s-hair-xs) solid var(--s-border-list); border-radius: var(--s-r-md); }
+/* Popup Menu Item (175:1583) — 42px + 1px divider */
+.s-menu > button {
+  all: unset; cursor: pointer; box-sizing: border-box; width: 100%; height: 43px; padding: 0 18px;
+  display: flex; align-items: center; gap: 8px; font-family: var(--s-font); font-size: 16px; color: var(--s-title-other);
+  background: var(--s-white); box-shadow: inset 0 -1px 0 var(--s-divider-color);
+}
+.s-menu > button:active, .s-menu > button.is-pressed { background: var(--s-grey-200); }
+
+/* ======================= Search (249:1242) ======================= */
+/* Search Bar (68:142) */
+.s-search { display: flex; align-items: center; gap: 16px; height: 48px; padding: 0 16px; background: var(--s-white); filter: drop-shadow(var(--s-shadow-bar)); }
+.s-search > button { all: unset; cursor: pointer; display: inline-flex; color: var(--s-icon); }
+/* Search Field (68:140) — standalone stroke #e9e9e9, inside bar #e2e2e2 */
+.s-search-field {
+  flex: 1; display: flex; align-items: center; gap: 10px; height: 30px; padding: 8px; overflow: hidden;
+  background: #f5f5f5; border: var(--s-hair-sm) solid #e9e9e9; border-radius: var(--s-r-pill);
+}
+.s-search .s-search-field { border-color: var(--s-border-list); }
+.s-search-field input { all: unset; flex: 1; min-width: 0; font-family: var(--s-font); font-size: 14px; color: var(--s-title-list); }
+.s-search-field input::placeholder { color: var(--s-subtitle-other); }
+.s-search-field > button { all: unset; cursor: pointer; display: inline-flex; }
+/* Search Result Item (70:1103) / Search Result List (181:530) */
+.s-result { display: flex; height: 60px; background: var(--s-white); box-shadow: inset 0 -1px 0 var(--s-divider-color); }
+.s-result__leading { width: 60px; flex: none; display: flex; align-items: center; justify-content: center; background: var(--s-container-misc); border-right: var(--s-hair-sm) solid var(--s-border-list); }
+.s-result__text { flex: 1; min-width: 0; display: flex; flex-direction: column; justify-content: center; padding: 12px 18px 10px; letter-spacing: 0.5px; line-height: 24px; }
+.s-result__title { font-size: 14px; color: var(--s-title-list); }
+.s-result__subtitle { font-size: 12px; color: var(--s-subtitle-other); }
+.s-search-with-result { position: relative; display: flex; flex-direction: column; }
+.s-search-with-result > .s-search { position: relative; z-index: 1; }
+
+/* ======================= Slide Bar (253:165) — <input type=range>; set --p 0–100 ======================= */
+.s-slider-row { display: flex; align-items: center; gap: 22px; }
+.s-slider-row > .s-icon, .s-slider-row > button { color: #808080; }
+.s-slider-card { display: flex; align-items: center; gap: 22px; height: 60px; padding: 0 18px; background: var(--s-white); border: var(--s-hair) solid var(--s-border-list); border-radius: var(--s-r-lg); box-shadow: var(--s-shadow-card-sm); }
+.s-slider-card > .s-icon { color: #808080; }
+.s-slider { --p: 50; appearance: none; -webkit-appearance: none; flex: 1; min-width: 0; height: 20px; margin: 0; background: transparent; cursor: pointer; }
+.s-slider::-webkit-slider-runnable-track {
+  height: 4px; border-radius: var(--s-r-pill); box-shadow: var(--s-inset-track);
+  background: var(--s-grad-slider-fill) 0 0 / calc(var(--p) * 1%) 100% no-repeat, #efefef;
+}
+.s-slider::-moz-range-track { height: 4px; border-radius: var(--s-r-pill); background: #efefef; box-shadow: var(--s-inset-track); }
+.s-slider::-moz-range-progress { height: 4px; border-radius: var(--s-r-pill); background: var(--s-grad-slider-fill); }
+.s-slider::-webkit-slider-thumb { -webkit-appearance: none; width: 20px; height: 20px; margin-top: -8px; border-radius: 50%; background: var(--s-white); border: var(--s-hair-xs) solid #f1f1f1; box-shadow: var(--s-shadow-slider-thumb); }
+.s-slider::-moz-range-thumb { width: 20px; height: 20px; border-radius: 50%; background: var(--s-white); border: 0.4px solid #f1f1f1; box-shadow: var(--s-shadow-slider-thumb); }
+
+/* ======================= Toast (40:1076) ======================= */
+.s-toast { display: inline-flex; align-items: center; justify-content: center; padding: 12px 16px; font-family: var(--s-font); font-size: 14px; font-weight: 700; color: #ad8a67; background: var(--s-grad-toast); border: var(--s-hair-xs) solid #d2b89c; border-radius: var(--s-r-md); white-space: nowrap; }
+
+/* ======================= Bottom Navigation Bar (203:2020 / 72:178) ======================= */
+.s-bottom-nav { display: flex; align-items: center; justify-content: center; gap: 48px; height: 54px; overflow: hidden; background: var(--s-white); }
+.s-bottom-nav > button, .s-bottom-nav > a {
+  all: unset; cursor: pointer; box-sizing: border-box; width: 38px; height: 40px;
+  display: flex; flex-direction: column; align-items: center; justify-content: space-between;
+  font-family: var(--s-font); font-size: 8px; color: var(--s-subtitle-other); white-space: nowrap;
+}
+.s-bottom-nav .s-icon { width: 22px; height: 22px; color: var(--s-icon-disabled); }
+.s-bottom-nav [aria-current="page"] { color: var(--s-title-other); }
+.s-bottom-nav [aria-current="page"] .s-icon { width: 28px; height: 28px; color: var(--s-title-other); }
+
+/* ======================= Kit documentation chrome (Header 248:874, Label 261:442) ======================= */
+/* Optional: for design-system / showcase pages in the kit's own style */
+.s-kit-canvas { background: #dddddd; padding: 40px; font-family: var(--s-font); }
+.s-kit-board { background: var(--s-board); border-radius: var(--s-r-kit); overflow: hidden; }
+.s-kit-board--white { background: var(--s-white); }
+.s-kit-header { position: relative; height: 220px; background: var(--s-grad-kit-header); }
+.s-kit-header__logo { position: absolute; left: 36px; top: 36px; width: 30px; height: 30px; }
+.s-kit-header__title { position: absolute; left: 36px; top: 110px; margin: 0; font-size: 48px; font-weight: 700; line-height: 1; color: rgba(255, 255, 255, 0.9); }
+.s-kit-body { padding: 56px 40px 64px; }
+.s-kit-set { border: 1px dashed var(--s-board-stroke); border-radius: 5px; padding: 20px; }
+.s-kit-label { display: inline-flex; align-items: center; padding: 4px 8px; font-size: 16px; color: var(--s-grey-900); background: var(--s-grey-400); border: 1px solid var(--s-grey-500); border-radius: 8px; }
+.s-kit-cover { position: relative; background: var(--s-grad-kit-header); color: #fff; }
+.s-kit-cover__caption { font-size: 20px; font-weight: 500; color: #b8b8b8; }

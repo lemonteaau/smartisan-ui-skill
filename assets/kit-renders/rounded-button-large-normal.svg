@@ -1,0 +1,32 @@
+<svg width="101.2" height="101.2" viewBox="0 0 101.2 101.2" fill="none" xmlns="http://www.w3.org/2000/svg">
+<g id="Rounded Button">
+<circle id="Outter" cx="50.6" cy="45.6" r="40" fill="#EDEDED"/>
+<g id="Inner" filter="url(#filter0_d_rounded_button_large_normal)">
+<circle cx="50.6" cy="45.6" r="34" fill="url(#paint0_linear_rounded_button_large_normal)"/>
+<circle cx="50.6" cy="45.6" r="33.8" stroke="#EEEEEE" stroke-width="0.4"/>
+</g>
+<g id="Icon-Play">
+<path id="Vector" d="M64.0167 45.2146C64.0174 45.5117 63.9412 45.804 63.7956 46.0629C63.6499 46.3218 63.4397 46.5387 63.1854 46.6923L47.4267 56.3326C47.161 56.4953 46.8567 56.5841 46.5452 56.5899C46.2337 56.5957 45.9263 56.5182 45.6548 56.3654C45.3859 56.2151 45.1618 55.9958 45.0057 55.7301C44.8496 55.4644 44.7671 55.162 44.7667 54.8539V35.5754C44.7671 35.2673 44.8496 34.9649 45.0057 34.6992C45.1618 34.4335 45.3859 34.2142 45.6548 34.0639C45.9263 33.9111 46.2337 33.8336 46.5452 33.8394C46.8567 33.8452 47.161 33.934 47.4267 34.0967L63.1854 43.737C63.4397 43.8906 63.6499 44.1075 63.7956 44.3664C63.9412 44.6253 64.0174 44.9176 64.0167 45.2146Z" fill="url(#paint1_linear_rounded_button_large_normal)"/>
+</g>
+</g>
+<defs>
+<filter id="filter0_d_rounded_button_large_normal" x="0" y="0" width="101.2" height="101.2" filterUnits="userSpaceOnUse" color-interpolation-filters="sRGB">
+<feFlood flood-opacity="0" result="BackgroundImageFix"/>
+<feColorMatrix in="SourceAlpha" type="matrix" values="0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 127 0" result="hardAlpha"/>
+<feOffset dy="5"/>
+<feGaussianBlur stdDeviation="8.3"/>
+<feComposite in2="hardAlpha" operator="out"/>
+<feColorMatrix type="matrix" values="0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0.21 0"/>
+<feBlend mode="normal" in2="BackgroundImageFix" result="effect1_dropShadow_rounded_button_large_normal"/>
+<feBlend mode="normal" in="SourceGraphic" in2="effect1_dropShadow_rounded_button_large_normal" result="shape"/>
+</filter>
+<linearGradient id="paint0_linear_rounded_button_large_normal" x1="50.6" y1="11.6" x2="50.6" y2="79.6" gradientUnits="userSpaceOnUse">
+<stop stop-color="white"/>
+<stop offset="1" stop-color="#FCFCFC"/>
+</linearGradient>
+<linearGradient id="paint1_linear_rounded_button_large_normal" x1="54.3917" y1="33.8391" x2="54.3917" y2="56.5902" gradientUnits="userSpaceOnUse">
+<stop stop-color="#8C8C8C"/>
+<stop offset="1" stop-color="#989898"/>
+</linearGradient>
+</defs>
+</svg>

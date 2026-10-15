@@ -1,0 +1,14 @@
+<svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+<g id="icon-redcheck">
+<g id="icon-redcheck_2">
+<circle id="Ellipse 11" cx="12" cy="12" r="11.8" fill="url(#paint0_linear_redcheck)" stroke="#DA463E" stroke-width="0.4"/>
+<path id="Vector" d="M10.7166 16.052L6.40002 11.8079L7.8626 10.3559L10.8 13.2L16.6209 7.60001L18 9.00001L10.7166 16.052Z" fill="white"/>
+</g>
+</g>
+<defs>
+<linearGradient id="paint0_linear_redcheck" x1="12" y1="0" x2="12" y2="24" gradientUnits="userSpaceOnUse">
+<stop stop-color="#E5645A"/>
+<stop offset="1" stop-color="#E55F55"/>
+</linearGradient>
+</defs>
+</svg>
