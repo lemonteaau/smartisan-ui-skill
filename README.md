@@ -4,7 +4,7 @@
 
 An Agent Skill that teaches coding agents to build front-end UI in the style of **Smartisan OS** — light skeuomorphism, whisper-quiet gradients, hairline borders, soft drop shadows and inset wells, a grey-first palette with a low-saturation blue accent and the Smartisan red.
 
-![Smartisan OS UI Kit cover](references/screenshots/00-cover.png)
+![smartisan-ui skill](docs/cover.png)
 
 ## 内容 · What's inside
 
@@ -34,6 +34,36 @@ An Agent Skill that teaches coding agents to build front-end UI in the style of 
 | Switch | `.s-switch` |
 | Tabs | `.s-tabs` |
 | Toast | `.s-toast` |
+
+## 效果展示 · Showcase
+
+用 [opencode](https://opencode.ai) + GLM-5.3 实测。提示词里**没有点名这个 skill**，只说了“锤子手机风格”；当时环境里装了 70 多个 skill，其中好几个也是设计类的，模型仍然自己选中了 `smartisan-ui`，然后按 SKILL.md 的步骤做：复制 `smartisan.css`、内联图标 sprite、用 `.s-*` 组件拼页面，最后自己验证交互。
+
+Tested with opencode + GLM-5.3. The prompt never names the skill — it just asks for "Smartisan phone style". The model picked `smartisan-ui` out of 70+ installed skills on its own.
+
+<details>
+<summary>任务提示词 · Task prompt</summary>
+
+```text
+做一个音乐 App 的「播放设置」页面，单个 index.html 文件（可以引用同目录下的 css 文件），
+要求做成锤子手机（Smartisan OS）的界面风格。
+
+1. 顶部标题栏：左边返回，中间标题「播放设置」，右边一个完成按钮。
+2. 一组「音效」设置列表：均衡器（右侧显示「流行」并带箭头）、杜比音效（开关，默认开）、无损音质（开关，默认关）。
+3. 一组「播放」设置列表：定时关闭（右侧显示「30 分钟」）、音量（一个滑块）。
+4. 底部一个主按钮「恢复默认设置」，点击后弹出确认对话框（取消 / 恢复），
+   点「恢复」后关闭对话框并显示一个提示「已恢复默认设置」。
+5. 最底部是底部导航：歌单、正在播放（当前页）、更多。
+```
+</details>
+
+**Web（HTML + skill 自带 CSS）**：页面 → 确认对话框 → 恢复后的提示。约 3 分钟完成，自写样式只有 43 行。
+
+![opencode + GLM-5.3 web result](docs/showcase/opencode-glm-web.png)
+
+**Flutter（同一个任务，只用 Flutter SDK）**：模型从 token 表把颜色、阴影、圆角翻译成 Dart，用 `CustomPainter` 画出竖条纹底和开关的小圆点，`flutter analyze` 零问题。
+
+<img src="docs/showcase/opencode-glm-flutter.png" width="320" alt="opencode + GLM-5.3 Flutter result">
 
 ## 安装 · Install
 
