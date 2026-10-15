@@ -54,7 +54,7 @@ git clone https://github.com/lemonteaau/smartisan-ui-skill ~/.claude/skills/smar
 
 ## 效果展示
 
-用 [opencode](https://opencode.ai) + GLM-5.3 实测。提示词里没有点名这个 skill，只写了“锤子手机风格”。当时装了 70 多个 skill，模型仍然自己选中了它。
+用 [opencode](https://opencode.ai) + GLM-5.3 实测。
 
 <details>
 <summary>任务提示词</summary>

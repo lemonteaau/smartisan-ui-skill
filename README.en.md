@@ -54,7 +54,7 @@ Just ask, e.g. "build a settings page in the Smartisan phone style" or "restyle 
 
 ## Showcase
 
-Tested with [opencode](https://opencode.ai) + GLM-5.3. The prompt never names the skill — it only asks for "Smartisan phone style" — yet the model picked it out of 70+ installed skills.
+Tested with [opencode](https://opencode.ai) + GLM-5.3.
 
 <details>
 <summary>Task prompt (Chinese)</summary>
