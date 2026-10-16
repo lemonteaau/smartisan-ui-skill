@@ -91,7 +91,7 @@
 | `--s-grad-picker-band` | `#fff 0 / #f5f5f5 53.5% / #f8f8f8` | 选中带 |
 | `--s-grad-kit-header` | `#222325 / #3b3c3f 49% / #222325`（横向） | 文档页头 |
 | `--s-page-texture` | `repeating-linear-gradient(90deg, #f0f0f0 0 3.6px, #eeeeee 3.6px 7.2px)` | **[R2]** 页面竖条纹 |
-| `--s-appbar-shadow` | `rgba(0,0,0,.045) → 0`，高 8px | **[R2]** App Bar 下方的渐隐阴影 |
+| `--s-appbar-shadow` | `rgba(0,0,0,.047) → 0`，高 14px | **[R2]** App Bar 下方的渐隐阴影（框架 `title_bar_shadow`，alpha 12→0） |
 
 ### Chip 配色
 | 色 | 底 | 描边 | 字 | 按下底 | 按下描边 |
@@ -165,7 +165,7 @@
 | `--s-inset-well` | `inset 0 4px 12px rgba(0,0,0,.18)` | 滚轮井 |
 | `--s-inset-field` | `inset 0 4px 4px rgba(0,0,0,.04)` | 输入框（Shadow/textfield-inner） |
 | `--s-inset-tab` | `inset 0 4px 10px rgba(0,0,0,.06)` | Tab 选中 |
-| `--s-inset-swipe` | `inset 0 0 4px rgba(0,0,0,.16)` | 左滑操作托盘 |
+| `--s-inset-swipe` | `inset 0 0 4px rgba(0,0,0,.16)` | 滑动删除托盘（行向右滑后露出） |
 | `--s-inset-radio` | `inset 0 0 2px rgba(0,0,0,.08)` | 单选外圈 |
 
 ## 尺寸与间距
@@ -180,6 +180,17 @@
 ## 真机补充（[R2] 实测）
 
 按下态、动效、间距、分隔线、分段 Tab、品牌栏的实测数值见 `device-behavior.md`。要点：顶栏下无细线、约 13dp `#dfdfdf` 渐隐投影；卡片间距约 14dp；卡片内分隔线 `#f3f3f3` 贯穿全宽；图文列表分隔线 `#efefef` 左右缩进 12dp；分区带约 6dp；对话框遮罩约 45%；设置页条纹 `#f4f4f4` / `#f2f2f2`、周期约 3.6dp。
+
+## 框架 token（Smartisan OS 8 资源表）
+
+完整表格和出处见 `motion.md` 第 1 节。速记：
+
+- **间距**是 6dp 网格：6 / 12 / 18 / 24 / 30 / 36 / 48 / 60（CSS `--s-space-1…10`），alt 档 8 / 10 / 16 / 26。
+- **字号**（sp）：20 / 17 / 16 / 15 / 13.5 / 12 / 10 / 8；[R2] 字体缩放 0.91，Kit 的 px 字号 ≈ sp × 0.91。
+- **文字色**是透明黑：`--s-text-primary` .8、`--s-text-title` .6、`--s-text-summary` .5、`--s-text-secondary` .384、`--s-text-hint` .3、`--s-text-disabled` .15；分隔线 `--s-list-divider` .08。
+- 其它：链接 `--s-link #5079d9`、警告 `--s-warning #d44d44`、成功 `--s-success #79ad31`、绿色 `--s-green #97cc4e`、列表按下 `--s-list-pressed #5e88eb`、多选行 `--s-list-selected #e5eeff`。
+- **动效**：`--s-ease-smooth`、`--s-ease-decel`、`--s-ease-decel-cubic`、`--s-ease-accel`、`--s-ease-spring`；`--s-dur-press` 64ms、`--s-dur-fast` 150、`--s-dur-swipe` 200、`--s-dur-base` 300。
+- 顶栏阴影 14dp（`title_bar_shadow`，alpha 12→0）；底栏阴影 11dp 向上。
 
 ## 暗色模式
 Kit 没有定义暗色。[R2] 实测 `Night mode: no`，这台设备上的 Smartisan OS 8.5.3 也没有开启系统暗色。如需暗色只能自行推导，并说明它不是官方规范。

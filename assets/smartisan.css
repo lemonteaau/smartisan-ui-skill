@@ -140,11 +140,50 @@
   /* ---------- Measured on a real Smartisan R2 (not in the Figma kit) ---------- */
   --s-page-real: #f0f0f0;                 /* real Settings page base */
   --s-page-texture: repeating-linear-gradient(90deg, #f0f0f0 0 3.6px, #eeeeee 3.6px 7.2px); /* vertical pinstripes */
-  --s-appbar-shadow: linear-gradient(180deg, rgba(0, 0, 0, 0.045), rgba(0, 0, 0, 0)); /* 8px fade under app bar */
+  --s-appbar-shadow: linear-gradient(180deg, rgba(0, 0, 0, 0.047), rgba(0, 0, 0, 0.004) 70%, rgba(0, 0, 0, 0)); /* title_bar_shadow: 14dp, alpha 12→1 */
   --s-icon-list-light: #cdcdcf;           /* leading icons in real Settings rows */
 
   /* ---------- Layout ---------- */
   --s-screen: 432px;      /* R2: 1080px / density 400 (2.5x) = 432dp */
+
+  /* ---------- Smartisan OS framework (smartisanos resource table, OS 8) ----------
+     See references/motion.md. Text colours are black with alpha; on white they equal the
+     kit greys (.8 = #333, .6 = #666, .5 = #7f7f7f, .384 = #9d9d9d), and they stay right on
+     tinted or striped backgrounds, so prefer them over the solid greys there. */
+  --s-text-primary: rgba(0, 0, 0, 0.8);      /* primary_text_color #cc000000 */
+  --s-text-title: rgba(0, 0, 0, 0.6);        /* title_or_btn_text_color #99000000 */
+  --s-text-summary: rgba(0, 0, 0, 0.5);      /* setting_item_summary_text_color #80000000 */
+  --s-text-secondary: rgba(0, 0, 0, 0.384);  /* secondary_text_color #62000000 */
+  --s-text-hint: rgba(0, 0, 0, 0.3);         /* input hint / section title #4c000000 */
+  --s-text-disabled: rgba(0, 0, 0, 0.15);    /* disabled_text_color #26000000 */
+  --s-list-divider: rgba(0, 0, 0, 0.08);     /* list_divider_color #14000000 */
+  --s-link: #5079d9;                          /* blue_highlight_link_text_color */
+  --s-warning: #d44d44;                       /* red_warning_failed_text_color */
+  --s-success: #79ad31;                       /* succeed_text_color */
+  --s-green: #97cc4e;                         /* green_btn_color (round add button) */
+  --s-list-pressed: #5e88eb;                  /* list_item_pressed / blue_highlight_list_item_color */
+  --s-list-selected: #e5eeff;                 /* multi-select row tint (Music 8.1 rewrite) */
+  --s-section-bg: #f5f5f5;                    /* list_section_title_background */
+
+  /* Spacing: the framework is a 6dp grid (small 6 / medium 12 / semi-large 18 / large 24 /
+     section bar 30 / avatar 36 / title bar 48 / list row 60); 8, 10, 16, 26 are the "alt" steps. */
+  --s-space-1: 6px;  --s-space-2: 12px; --s-space-3: 18px; --s-space-4: 24px;
+  --s-space-5: 30px; --s-space-6: 36px; --s-space-8: 48px; --s-space-10: 60px;
+
+  /* Type scale in sp: 20 / 17 / 16 / 15 / 13.5 / 12 / 10 / 8. The R2 ships with font scale 0.91,
+     which is why the kit's px sizes are ~0.91x of these (20→18 dialog title, 17→16 bar title). */
+  --s-font-scale: 0.91;
+
+  /* Motion. Pressed states are instant; everything else uses these curves. */
+  --s-ease-smooth: cubic-bezier(0.37, 0, 0.63, 1);   /* (1 - cos πt) / 2 — tabs, edit mode, push */
+  --s-ease-decel: cubic-bezier(0.5, 1, 0.89, 1);     /* 1 - (1 - t)^2 — back, sheets, dialogs */
+  --s-ease-decel-cubic: cubic-bezier(0.33, 1, 0.68, 1); /* 1 - (1 - t)^3 — full-screen page up/down */
+  --s-ease-accel: cubic-bezier(0.11, 0, 0.5, 0);     /* t^2 — things leaving */
+  --s-ease-spring: cubic-bezier(0.34, 1.7, 0.6, 1);  /* overshoot ≈ spring(damping .55, stiffness 800) */
+  --s-dur-press: 64ms;     /* minimum time a quick tap stays visibly pressed */
+  --s-dur-fast: 150ms;     /* title cross-fade halves, popup menu */
+  --s-dur-swipe: 200ms;    /* swipe row settle, quick bar, wheel snap */
+  --s-dur-base: 300ms;     /* page push, sheet in, full-screen page */
 }
 
 /* ======================= Base ======================= */
@@ -182,18 +221,27 @@
 .s-appbar__spacer { flex: 1; }
 .s-appbar__actions { display: flex; align-items: center; gap: 18px; }
 /* zero specificity on purpose: any class you put on an app-bar button overrides this reset */
-:where(.s-appbar > button, .s-appbar__actions > button):where(:not(.s-btn, .s-btn-icon)) { all: unset; cursor: pointer; display: inline-flex; align-items: center; color: var(--s-icon); }
+:where(.s-appbar > button, .s-appbar__actions > button):where(:not(.s-btn, .s-btn-icon)) {
+  all: unset; cursor: pointer; display: inline-flex; align-items: center; justify-content: center; color: var(--s-icon);
+  transition: transform 260ms var(--s-ease-spring);
+}
+/* Bar icons (TitleBar setBarIconScaleTouchListener): the glyph darkens and pops to 1.33x on a spring
+   while held, then springs back. No background highlight. */
+:where(.s-appbar > button, .s-appbar__actions > button):where(:not(.s-btn, .s-btn-icon)):where(:active, .is-pressed) { transform: scale(1.33); color: #5f5f5f; }
+:where(.s-appbar > button, .s-appbar__actions > button):where(:not(.s-btn, .s-btn-icon)):where(:active, .is-pressed) .s-icon { color: #5f5f5f; }
 /* Text actions in the bar: prefer .s-btn.s-btn--sm (primary, e.g. 完成) or .s-btn.s-btn--outline (secondary),
    both are 30px and sit in the 48px bar like the kit. Plain text fallback (not in the kit, derived): */
 .s-appbar__text { font-family: var(--s-font); font-size: 16px; font-weight: 500; color: var(--s-title-other); }
 .s-appbar__text:active { opacity: .6; }
 .s-appbar--red { background: var(--s-grad-appbar-red); border-bottom-color: var(--s-appbar-red-border); }
-/* Real device: the app bar casts an 8px soft fade onto the page (optional) */
-.s-appbar--shadow { z-index: 2; }
-.s-appbar--shadow::after { content: ""; position: absolute; left: 0; right: 0; top: 100%; height: 8px; background: var(--s-appbar-shadow); pointer-events: none; }
+/* Real device: no hairline, a 14dp soft fade onto the page instead (title_bar_shadow_height = 14dp) */
+.s-appbar--shadow { z-index: 2; border-bottom-color: transparent; }
+.s-appbar--shadow::after { content: ""; position: absolute; left: 0; right: 0; top: 100%; height: 14px; background: var(--s-appbar-shadow); pointer-events: none; }
 /* Real-device Settings style: lighter leading icons in list rows (optional) */
 .s-list--light-icons .s-list-item > .s-icon:first-child { color: var(--s-icon-list-light); }
 .s-appbar--red .s-appbar__title, .s-appbar--red > button, .s-appbar--red .s-appbar__actions > button, .s-appbar--red .s-icon { color: var(--s-white); }
+.s-appbar--red > button:active .s-icon, .s-appbar--red > button.is-pressed .s-icon,
+.s-appbar--red .s-appbar__actions > button:active .s-icon, .s-appbar--red .s-appbar__actions > button.is-pressed .s-icon { color: rgba(255, 255, 255, 0.7); }
 
 /* ======================= Buttons ======================= */
 /* Elevated Button (18:7) — large 408×60 */
@@ -327,10 +375,15 @@
 .s-list-item__detail { display: flex; align-items: center; font-size: 16px; color: var(--s-subtitle-list); white-space: nowrap; }
 .s-list-item__detail .s-icon { color: var(--s-icon-chevron); }
 a.s-list-item, button.s-list-item, .s-list-item[data-pressable] { cursor: pointer; }
-a.s-list-item:active, button.s-list-item:active, .s-list-item[data-pressable]:active, .s-list-item.is-pressed {
+/* Without smartisan.js rows use :active. With it (html.s-js) the script owns the state like Android's
+   ListView: pressed after a 100ms tap timeout, at least 64ms for a quick tap, cancelled when the finger
+   starts a scroll — so flinging a list never flashes rows blue. */
+:root:not(.s-js) :is(a.s-list-item, button.s-list-item, .s-list-item[data-pressable]):active, .s-list-item.is-pressed {
   background: var(--s-blue-300); box-shadow: inset 0 0 0 var(--s-hair-xs) var(--s-blue-500);
 }
-a.s-list-item:active *, button.s-list-item:active *, .s-list-item[data-pressable]:active *, .s-list-item.is-pressed * { color: var(--s-white) !important; }
+:root:not(.s-js) :is(a.s-list-item, button.s-list-item, .s-list-item[data-pressable]):active *, .s-list-item.is-pressed * { color: var(--s-white) !important; }
+/* Multi-select (edit mode): checked rows get a light blue tint, text keeps its colour */
+.s-list-item[aria-selected="true"], .s-list-item.is-selected { background: var(--s-list-selected); }
 .s-list-item[aria-disabled="true"] { pointer-events: none; }
 .s-list-item[aria-disabled="true"], .s-list-item[aria-disabled="true"] * { color: var(--s-disabled) !important; }
 .s-list-item[aria-disabled="true"] .s-icon { color: var(--s-icon-disabled) !important; }
@@ -353,7 +406,9 @@ a.s-list-item:active *, button.s-list-item:active *, .s-list-item[data-pressable
 .s-list-item--plain .s-list-item__subtitle { font-size: 12px; color: var(--s-text-tile3); }
 .s-list-item--plain::after { content: ""; display: block; height: 0.5px; background: #ddd; }
 
-/* Slidable List Tile (211:1357) — row slid left reveals an inset action tray */
+/* Slidable List Tile (211:1357). Smartisan swipes RIGHT: the row slides right and uncovers the tray on
+   the left (Music, Clock, Notes all do this). Static markup = the open state, as in the kit.
+   Add data-s-swipe and load smartisan.js for the gesture (see references/motion.md). */
 .s-swipe { display: flex; overflow: hidden; width: 100%; }
 .s-swipe__actions {
   flex: none; display: flex; align-items: center; gap: 20px; padding: 16px;
@@ -361,6 +416,14 @@ a.s-list-item:active *, button.s-list-item:active *, .s-list-item[data-pressable
 }
 .s-swipe__actions > button { all: unset; cursor: pointer; display: inline-flex; color: var(--s-icon); }
 .s-swipe > .s-list-item { flex: none; width: 100%; border: 1px solid var(--s-grey-400); gap: 18.4px; padding: 0 11.2px 0 18.4px; }
+.s-swipe[data-s-swipe] { position: relative; touch-action: pan-y; background: var(--s-page-texture); }
+.s-swipe[data-s-swipe] > .s-swipe__actions { position: absolute; left: 0; top: 0; bottom: 0; border: 0; padding: 0 16px; }
+.s-swipe[data-s-swipe] > .s-list-item {
+  border: 0; transform: translateX(var(--x, 0px)); transition: transform 200ms var(--s-ease-smooth);
+  box-shadow: inset 0 calc(-1 * var(--s-hair)) 0 var(--s-divider-color), -2px 0 4px rgba(0, 0, 0, 0.06);
+}
+.s-swipe[data-s-swipe].is-dragging > .s-list-item { transition: none; }
+.s-swipe.is-removing { overflow: hidden; transition: height 200ms var(--s-ease-decel), opacity 200ms; height: 0 !important; opacity: 0; }
 
 /* ======================= Switch (42:1333) — <input type=checkbox> ======================= */
 .s-switch {
@@ -376,10 +439,13 @@ a.s-list-item:active *, button.s-list-item:active *, .s-list-item[data-pressable
 .s-switch::before { /* thumb: left when off, right when on */
   content: ""; position: absolute; top: -0.4px; left: -0.4px; width: 24px; height: 24px; border-radius: 50%; z-index: 1;
   background: var(--s-grad-white); border: var(--s-hair-xs) solid var(--s-grey-400); box-shadow: var(--s-shadow-thumb);
-  transition: left 0.18s ease;
+  left: calc(-0.4px + var(--pos, 0) * (100% - 23.2px));
+  transition: left calc(84ms * var(--travel, 1)) linear;   /* SwitchEx: 350dp/s, linear */
 }
-.s-switch:checked::before { left: calc(100% - 23.6px); }
-.s-switch:disabled { opacity: 0.4; cursor: default; }
+.s-switch:checked { --pos: 1; }
+.s-switch.is-dragging::before { transition: none; }   /* smartisan.js sets --pos while the thumb is dragged */
+.s-switch:active::before, .s-switch.is-dragging::before { box-shadow: var(--s-shadow-thumb), 0 0 0 0.4px #d0d0d0; background: var(--s-grad-white-pressed); }
+.s-switch:disabled { opacity: 0.75; cursor: default; }   /* SwitchEx disabled alpha 191/255 */
 
 /* ======================= Radio (171:398) — <input type=radio> ======================= */
 .s-radio {
@@ -401,9 +467,25 @@ a.s-list-item:active *, button.s-list-item:active *, .s-list-item[data-pressable
 /* ======================= Dialog (248:871) ======================= */
 .s-overlay { position: fixed; inset: 0; z-index: 100; display: flex; align-items: center; justify-content: center; padding: 32px; background: var(--s-overlay); }
 .s-overlay--inline { position: relative; inset: auto; z-index: auto; }
+.s-overlay--in-frame { position: absolute; }   /* inside a position:relative phone frame instead of the viewport */
 .s-overlay[hidden] { display: none; }   /* .s-overlay sets display:flex, which would beat the UA [hidden] rule */
-.s-overlay:not([hidden]) { animation: s-fade-in .15s ease; }
+/* Dialog in: scrim fades, card scales 0.85 → 1 and fades (≈250ms, decelerate; R2 recording). Out is quicker and
+   accelerates (150ms). smartisan.js adds .is-closing before setting [hidden]. */
+.s-overlay:not([hidden]) { animation: s-fade-in 250ms var(--s-ease-decel); }
+.s-overlay:not([hidden]) > .s-dialog { animation: s-dialog-in 250ms var(--s-ease-decel); }
+.s-overlay.is-closing { animation: s-fade-out 150ms var(--s-ease-accel) forwards; }
+.s-overlay.is-closing > .s-dialog { animation: s-dialog-out 150ms var(--s-ease-accel) forwards; }
+/* Bottom menu (MenuDialog / bottom sheet): slides up 300ms decelerate, leaves 250ms accelerate */
+.s-overlay--sheet { align-items: flex-end; padding: 0; }
+.s-overlay--sheet:not([hidden]) > .s-sheet { animation: s-sheet-in 300ms var(--s-ease-decel); }
+.s-overlay--sheet.is-closing { animation-duration: 250ms; }
+.s-overlay--sheet.is-closing > .s-sheet { animation: s-sheet-out 250ms var(--s-ease-accel) forwards; }
 @keyframes s-fade-in { from { opacity: 0; } to { opacity: 1; } }
+@keyframes s-fade-out { from { opacity: 1; } to { opacity: 0; } }
+@keyframes s-dialog-in { from { opacity: 0; transform: scale(0.85); } to { opacity: 1; transform: none; } }
+@keyframes s-dialog-out { from { opacity: 1; transform: none; } to { opacity: 0; transform: scale(0.9); } }
+@keyframes s-sheet-in { from { transform: translateY(100%); } to { transform: none; } }
+@keyframes s-sheet-out { from { transform: none; } to { transform: translateY(100%); } }
 .s-dialog { width: 368px; max-width: 100%; display: flex; flex-direction: column; font-family: var(--s-font); }
 .s-dialog.is-pressed { opacity: 0.9; }
 .s-dialog.is-pressed .s-dialog__body { color: var(--s-title-other); }
@@ -553,3 +635,134 @@ a.s-list-item:active *, button.s-list-item:active *, .s-list-item[data-pressable
 .s-kit-label { display: inline-flex; align-items: center; padding: 4px 8px; font-size: 16px; color: var(--s-grey-900); background: var(--s-grey-400); border: 1px solid var(--s-grey-500); border-radius: 8px; }
 .s-kit-cover { position: relative; background: var(--s-grad-kit-header); color: #fff; }
 .s-kit-cover__caption { font-size: 20px; font-weight: 500; color: #b8b8b8; }
+
+/* ==========================================================================
+   Smartisan OS framework layer — components and behaviour that the Figma kit does not
+   draw but every system app uses. Values come from the smartisanos framework resources
+   and from the community 1:1 rewrites of Music / Weather / Clock (references/motion.md).
+   ========================================================================== */
+
+/* Danger button (long_btn_red / MenuDialog red button). Works on .s-btn (60) and .s-btn--sheet (48). */
+.s-btn--danger { color: var(--s-white); background: linear-gradient(180deg, #e66359, #e55f55); border: var(--s-hair) solid #d2463c; filter: none; }
+.s-btn--danger:active, .s-btn--danger.is-pressed { background: #df4f46; border-color: #c43c33; }
+
+/* Section title bar (list_section_title): 30dp grey strip above a flush list */
+.s-section-title {
+  display: flex; align-items: center; height: 30px; padding: 0 var(--s-space-2);
+  background: var(--s-section-bg); font-size: 12px; color: var(--s-grey-600);
+  box-shadow: inset 0 -1px 0 rgba(0, 0, 0, 0.04);
+}
+
+/* Empty state (blank view): big pale glyph, bold grey title, lighter hint; centred, 60dp side margins */
+.s-empty { display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 40px 60px; text-align: center; }
+.s-empty__icon { width: 120px; height: 120px; color: #d6d6d6; }
+.s-empty__icon.s-icon { width: 96px; height: 96px; margin: 12px; }
+.s-empty__title { margin-top: var(--s-space-3); font-size: 16px; font-weight: 700; color: var(--s-grey-500); }
+.s-empty__desc { margin-top: 5px; font-size: 12px; color: #c8c8c8; }
+.s-empty > .s-btn, .s-empty > .s-round-btn { margin-top: var(--s-space-4); }
+
+/* Check circle (check_box_mini): multi-select in edit mode. Off = thin grey ring, on = blue disc + white ✓ */
+.s-check {
+  appearance: none; -webkit-appearance: none; margin: 0; flex: none; cursor: pointer; position: relative;
+  width: 22px; height: 22px; border-radius: 50%; background: var(--s-white);
+  border: 1.2px solid #c9c9c9; box-shadow: inset 0 1px 1px rgba(0, 0, 0, 0.04);
+}
+.s-check:checked {
+  border-color: #4f7ff0; background: linear-gradient(180deg, #6b97ff, #5a87f5);
+  box-shadow: 0 1px 1.5px rgba(40, 80, 200, 0.25);
+}
+.s-check:checked::after {
+  content: ""; position: absolute; left: 6.6px; top: 3.4px; width: 5.4px; height: 10px;
+  border: solid var(--s-white); border-width: 0 2px 2px 0; transform: rotate(42deg);
+}
+.s-check--red:checked { border-color: #d24a40; background: linear-gradient(180deg, #ec6a60, #e5584e); box-shadow: 0 1px 1.5px rgba(200, 60, 50, 0.25); }
+.s-check:disabled { opacity: 0.4; cursor: default; }
+
+/* Round add / remove buttons (add_round_s_btn / remove_round_btn): edit lists, e.g. world clock */
+.s-round-add, .s-round-remove {
+  appearance: none; cursor: pointer; flex: none; position: relative; width: 22px; height: 22px; padding: 0;
+  border-radius: 50%; border: var(--s-hair) solid; box-shadow: 0 1px 1.5px rgba(0, 0, 0, 0.15);
+}
+.s-round-add { background: linear-gradient(180deg, #a5d65c, #8fc445); border-color: #7fb236; }
+.s-round-remove { background: linear-gradient(180deg, #ec6a60, #e3564c); border-color: #cf453b; }
+.s-round-add::before, .s-round-add::after, .s-round-remove::before {
+  content: ""; position: absolute; left: 50%; top: 50%; width: 11px; height: 2.4px; margin: -1.2px 0 0 -5.5px;
+  border-radius: 1px; background: var(--s-white);
+}
+.s-round-add::after { transform: rotate(90deg); }
+.s-round-add:active, .s-round-add.is-pressed { background: #84b93b; }
+.s-round-remove:active, .s-round-remove.is-pressed { background: #d84c42; }
+
+/* Quick bar (QuickBar / letters bar): A–Z# strip on the right edge of a long list. The strip is bare
+   until touched; while the finger is on it a pale backing + shadow appear and the touched letter
+   is shown in a bubble. smartisan.js fires "s-letter" ({detail: "K"}) on the .s-quickbar. */
+.s-quickbar {
+  position: absolute; right: 0; top: 0; bottom: 0; z-index: 3; width: 34px; padding: 6px 0;
+  display: flex; flex-direction: column; justify-content: space-between; align-items: center;
+  touch-action: none; user-select: none; -webkit-user-select: none; cursor: pointer;
+}
+.s-quickbar > span { flex: 1; display: flex; align-items: center; font-size: 10px; font-weight: 700; color: #9a9a9a; line-height: 1; }
+.s-quickbar.is-active { background: linear-gradient(90deg, rgba(245, 245, 245, 0.92), #f5f5f5); box-shadow: -3px 0 8px rgba(0, 0, 0, 0.08); }
+.s-quickbar > span.is-current { color: var(--s-icon-blue); }
+.s-quickbar__bubble {
+  position: absolute; right: 48px; width: 60px; height: 60px; margin-top: -30px; border-radius: 50%;
+  display: flex; align-items: center; justify-content: center; pointer-events: none;
+  font-size: 28px; font-weight: 700; color: var(--s-white); background: rgba(0, 0, 0, 0.55);
+}
+
+/* Page stack: horizontal push / pop. Put pages in .s-stack; smartisan.js animates them.
+   Push: new page slides in from the right over 300ms (smooth), the old page drifts left by a third;
+   the new page arrives blank (page colour + soft left-edge shadow) and its content fades in over the
+   last 40%. Pop mirrors it with a decelerating curve. */
+.s-stack { position: relative; overflow: hidden; }
+.s-stack > .s-stack__page { position: absolute; inset: 0; overflow: auto; background: var(--s-page); -webkit-overflow-scrolling: touch; }
+.s-stack > .s-stack__page[hidden] { display: none; }
+.s-stack__page.is-entering { animation: s-push-in 300ms var(--s-ease-smooth) both; box-shadow: -6px 0 12px rgba(0, 0, 0, 0.08); z-index: 2; }
+.s-stack__page.is-entering > * { animation: s-content-late 300ms linear both; }
+.s-stack__page.is-leaving { animation: s-push-out 300ms var(--s-ease-smooth) both; z-index: 1; }
+.s-stack__page.is-popping { animation: s-pop-out 270ms var(--s-ease-decel) both; box-shadow: -6px 0 12px rgba(0, 0, 0, 0.08); z-index: 2; }
+.s-stack__page.is-returning { animation: s-pop-in 270ms var(--s-ease-decel) both; z-index: 1; }
+.s-stack__page.is-returning > * { animation: s-content-late 270ms linear both; }
+@keyframes s-push-in { from { transform: translateX(100%); } to { transform: none; } }
+@keyframes s-push-out { from { transform: none; opacity: 1; } to { transform: translateX(-33%); opacity: 0.4; } }
+@keyframes s-pop-out { from { transform: none; } to { transform: translateX(100%); } }
+@keyframes s-pop-in { from { transform: translateX(-33%); opacity: 0.4; } to { transform: none; opacity: 1; } }
+@keyframes s-content-late { 0%, 60% { opacity: 0; } 100% { opacity: 1; } }
+
+/* Fixed title bar over a stack (Notes / Music List2Detail): the bar stays put; the old title and
+   icons fade out 0–150ms, the new ones fade in 150–300ms; the back arrow waits 100ms, then fades in
+   over 150ms while sliding in from the right over 200ms. smartisan.js toggles these classes. */
+.s-appbar .is-fading-out { animation: s-fade-out 150ms var(--s-ease-smooth) both; }
+.s-appbar .is-fading-in { animation: s-fade-in 150ms var(--s-ease-smooth) 150ms both; }
+.s-appbar .is-back-in { animation: s-back-in 200ms var(--s-ease-smooth) 100ms both; }
+.s-appbar .is-back-out { animation: s-back-out 300ms var(--s-ease-decel) both; }
+@keyframes s-back-in { from { opacity: 0; transform: translateX(48px); } 75% { opacity: 1; } to { opacity: 1; transform: none; } }
+@keyframes s-back-out { from { opacity: 1; transform: none; } 50% { opacity: 0; } to { opacity: 0; transform: translateX(48px); } }
+
+/* Full-screen page (settings, editors, search, "new …"): rises from the bottom over 300ms
+   (decelerate cubic) while the page underneath stays still; leaves downward to 109% in 300ms. */
+.s-modal-page { position: fixed; inset: 0; z-index: 90; overflow: auto; background: var(--s-page); }
+.s-modal-page--in-frame { position: absolute; }
+.s-modal-page[hidden] { display: none; }
+.s-modal-page:not([hidden]) { animation: s-page-up 300ms var(--s-ease-decel-cubic) both; }
+.s-modal-page.is-closing { animation: s-page-down 300ms var(--s-ease-decel-cubic) both; }
+@keyframes s-page-up { from { transform: translateY(100%); } to { transform: none; } }
+@keyframes s-page-down { from { transform: none; } to { transform: translateY(109%); } }
+
+/* Elastic scroll container: rubber-band past either end, no glow, no stretch (smartisan.js) */
+.s-elastic { overflow: auto; overscroll-behavior: contain; }
+.s-elastic > .s-elastic__content { transform: translateY(var(--o, 0px)); }
+.s-elastic.is-returning > .s-elastic__content { transition: transform 250ms cubic-bezier(0.2, 0.9, 0.3, 1); }
+
+/* Wheel picker driven by smartisan.js: .s-picker__col[data-s-wheel] — 5 visible rows; the row in the
+   band grows 16 → 18px and greys #b3b3b5 → #55585c as it nears the centre; edges fade over 1/6. */
+.s-picker__col[data-s-wheel] {
+  display: block; gap: 0; padding: 0; overflow: hidden; touch-action: none; cursor: grab; user-select: none; -webkit-user-select: none;
+  -webkit-mask-image: linear-gradient(180deg, transparent, #000 16.7%, #000 83.3%, transparent);
+  mask-image: linear-gradient(180deg, transparent, #000 16.7%, #000 83.3%, transparent);
+}
+.s-picker__col[data-s-wheel] > * { position: absolute; left: 0; right: 0; top: 0; display: flex; align-items: center; justify-content: center; height: var(--row, 40px); will-change: transform; }
+
+@media (prefers-reduced-motion: reduce) {
+  .s-overlay, .s-overlay > *, .s-stack__page, .s-stack__page > *, .s-modal-page, .s-appbar * { animation-duration: 1ms !important; animation-delay: 0ms !important; }
+}

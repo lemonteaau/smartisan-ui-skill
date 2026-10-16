@@ -13,12 +13,13 @@
 | `smartisan_adapters.dart` | `SmartisanSwitch`（可直接替换 Material `Switch`）、`SmartisanListSection`（分组卡片）、**`SmartisanTile`**（列表行：按下整行变强调色、内容变白，瞬时）、`SmartisanChevron` |
 | `smartisan_tabs.dart` | **`SmartisanTabBar`**：真机分段 Tab（选中段内凹灰），包着 Material `TabBar`，`TabController` / 滑动照常工作，可放进 `AppBar.bottom` |
 | `smartisan_bars.dart` | `SmartisanBrandBar` + `SmartisanSearchWell`（品牌色顶栏 + 内凹搜索框）、`SmartisanPinstripe`（真机竖条纹底）、`SmartisanSectionGap`（分区灰带 / 分区标题条）、`SmartisanBarShadow` |
-| `smartisan_motion.dart` | `SmartisanScrollBehavior`（弹性回弹、无光晕）、`SmartisanDialogEntrance`（0.85→1 缩放淡入） |
+| `smartisan_motion.dart` | **转场与动效**：`SMotion`（64ms 最短按下、100ms 点击超时、150 / 200 / 250 / 300ms、smooth / decelerate / accelerate 曲线）、`SPageRoute` 与 `SPageTransitionsBuilder`（横推：新页空白滑入、内容最后 40% 淡入、旧页左移 1/3）、`SModalPageRoute`（全屏页从底部升起）、`SDialogRoute`（0.85→1 缩放淡入 250ms、150ms 退出）、`SmartisanScrollBehavior`（弹性回弹、无光晕） |
+| `smartisan_interaction.dart` | **框架层组件**：`SSwipeRow`（向右滑露出删除托盘，1/5 阻尼，同时只开一行）、`SQuickBar`（A–Z 字母索引条，带字母气泡和触觉）、`SEmptyState`、`SSectionTitle`（30dp 分区条）、`SCheck`（多选勾选圈，可红色）、`SRoundEditButton.add / .remove` |
 | `smartisan_icons.dart` | Kit 的 23 个矢量图标（`SIcons.back` 等，`SIcon` 绘制） |
 | `smartisan_glyphs.dart` + `glyphs/` | **`SGlyphs`**：166 个锤子风格字形的图标字体（Phosphor Icons fill / bold 字重，MIT）。用法同 `Icons`：`Icon(SGlyphs.like)` |
 | `smartisan_gallery_page.dart` | 组件预览页，装好后先打开它目测一遍 |
 
-真机交互、动效、间距的依据见 `references/device-behavior.md`。
+真机交互、动效、间距的依据见 `references/device-behavior.md`；按压时序、转场时长、手势参数和出处见 `references/motion.md`。
 
 ## 接入
 
@@ -111,7 +112,7 @@ Scaffold(
 ## 容易做错的地方
 
 1. **对话框遮罩**：Kit 写的是 60%，[R2] 实测约 45%。`SmartisanMaterialTheme` 用 45%；用 `showSDialog` 时是 Kit 的 60%。不要写 `Colors.transparent`。
-2. **不要留下 Material 的标志性元素**：`Switch`、`Slider`（未换主题时）、`NavigationBar` 的胶囊指示器、`AlertDialog` 默认按钮排布、`SnackBar`、`Icons.*_outlined` 线框图标、下划线 `TabBar`、缩放转场。只要留一个，整页就会显得"Material + 锤子混搭"。对应替换：`SmartisanSwitch`、主题里的滑块、`SBottomNav` / 底栏主题、`showSDialog`、`showSToast`、`SGlyphs`、`SmartisanTabBar`、`CupertinoPageTransitionsBuilder`（主题已设）。
+2. **不要留下 Material 的标志性元素**：`Switch`、`Slider`（未换主题时）、`NavigationBar` 的胶囊指示器、`AlertDialog` 默认按钮排布、`SnackBar`、`Icons.*_outlined` 线框图标、下划线 `TabBar`、缩放转场。只要留一个，整页就会显得"Material + 锤子混搭"。对应替换：`SmartisanSwitch`、主题里的滑块、`SBottomNav` / 底栏主题、`showSDialog`、`showSToast`、`SGlyphs`、`SmartisanTabBar`、`SPageTransitionsBuilder`（主题已设）。
 3. **按下态是瞬时换色，不是水波纹，也不是淡入高亮**。主题已关 splash，并给所有 `ButtonStyle` 设了 `animationDuration: Duration.zero`。列表行用 `SmartisanTile`；自己写的可点击元素用 `SPressable(builder: (context, pressed) => …)`。`AnimatedContainer` 做按下态会在页面被推走时"冻住"，松开后回来还看到蓝色，不要用。
 4. **`PopupMenuButton` 不给 `icon` 时会画 Material 的 `⋮`**，主题改不掉，记得写 `icon: const Icon(SGlyphs.more)`（锤子的"更多"是横向 `•••`）。
 5. **卡片里放 `ListTile` / `InkWell`**：卡片表面要是 `Material`（`SmartisanListSection` 已经这样做），用带颜色的 `DecoratedBox` 会挡住它们的绘制，debug 下还会断言。
@@ -122,5 +123,9 @@ Scaffold(
 10. **字体**：真机是 Smartisan Compact 加 Noto Sans CJK SC，Kit 用的是 Inter。`SText` 配了 `fontFamilyFallback`，没装这些字体时会回落到系统字体。不要把 `fontFamily` 写死成 `'PingFang SC'`，Android 上没有这个字体。
 11. **尺寸**：设计宽度是 432dp（R2 真机）。卡片和大按钮左右各留 12dp、卡片间 14dp；行高 60；App Bar 48；底部导航 54。
 12. **描边**：0.4、0.5、0.8 这些细线在 Flutter 里直接写 `width: SHair.xs / sm / md`。
-13. 路由库（如 GetX）有自己的转场时，主题里的 `pageTransitionsTheme` 可能不生效，要在路由库里选横向推入（GetX：`Transition.cupertino`）。
+13. 路由库（如 GetX）有自己的转场时，主题里的 `pageTransitionsTheme` 可能不生效：GetX 用 `customTransition` 包一层 `sPushTransition(...)`；go_router 用 `CustomTransitionPage(transitionsBuilder: sPushTransition)`。
+15. **两种页面打开方式要分清**：往下一层看详情用横推（`SPageRoute`，或主题里的 `MaterialPageRoute`）；设置、编辑器、搜索、"新建…"这类整页用 `SModalPageRoute` 从底部升起，下面的页不动。
+16. **列表行的按压**：自己用 `SPressable` 做列表行时传 `delayed: true`（过 100ms 才变色，滚动时不闪）；按钮不用传。`SListTile` / `SmartisanTile` 已经按这个时序处理，快速点击也会保留 64ms 的按下色。
+17. **开关、滑动删除、滚轮的手感已经内置**：`SSwitch` 可以拖，归位是 350dp/s 的线性移动；`SSwipeRow` 是向右滑；`SWheelPicker` 是平的，越靠近中间字越大越深，每格一次 `selectionClick` 触觉。不要再自己包 `Dismissible`（那是左右滑走的 Material 行为）。
+18. 底部菜单里的危险操作：`SDialogAction('清除', destructive: true)` 会变成红色 `SButtonKind.danger` 按钮。
 14. Kit 图标要更新时，改 `assets/icons-sprite.svg`，再运行 `python3 tools/gen_dart_icons.py`；字形字体要增删时改 `assets/flutter/glyphs/build.py` 里的列表再运行它（码位按顺序分配，不要重排已有的）。

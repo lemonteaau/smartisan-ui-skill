@@ -2,6 +2,7 @@ import 'dart:async' show Timer;
 
 import 'smartisan_palette.dart';
 import 'smartisan_widgets.dart';
+
 import 'package:flutter/gestures.dart' show DragStartBehavior;
 import 'package:flutter/material.dart';
 
@@ -164,10 +165,8 @@ class SmartisanChevron extends StatelessWidget {
   const SmartisanChevron({super.key});
 
   @override
-  Widget build(BuildContext context) => SIcon(
-    SIcons.chevronRight,
-    color: SPalette.of(context).chevron,
-  );
+  Widget build(BuildContext context) =>
+      SIcon(SIcons.chevronRight, color: SPalette.of(context).chevron);
 }
 
 /// Smartisan list row, as on the R2: 56–60dp, pale filled glyph in front,
@@ -226,12 +225,11 @@ class _SmartisanTileState extends State<SmartisanTile> {
   bool get _interactive =>
       widget.enabled && (widget.onTap != null || widget.onLongPress != null);
 
+  // TapGestureRecognizer reports onTapDown after the 100ms tap timeout (kPressTimeout), the same
+  // delay Android's ListView uses, so a scroll that starts on a row never flashes it blue.
   void _down(TapDownDetails _) {
     _timer?.cancel();
-    // a short delay so rows do not flash blue when a scroll starts on them
-    _timer = Timer(const Duration(milliseconds: 60), () {
-      if (mounted) setState(() => _pressed = true);
-    });
+    if (mounted) setState(() => _pressed = true);
   }
 
   void _clear() {
@@ -245,9 +243,9 @@ class _SmartisanTileState extends State<SmartisanTile> {
       // finger was resting on the row: release immediately
       _clear();
     } else if (mounted) {
-      // quick tap: flash the pressed colour for a frame or two
+      // quick tap: keep the pressed colour for the platform's 64ms pressed-state duration
       setState(() => _pressed = true);
-      _timer = Timer(const Duration(milliseconds: 50), _clear);
+      _timer = Timer(SMotion.pressedMin, _clear);
     }
   }
 

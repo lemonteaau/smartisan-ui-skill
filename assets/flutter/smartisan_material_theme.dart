@@ -6,13 +6,14 @@
 // Values come from the Smartisan OS UI Kit tokens (smartisan_theme.dart); the
 // dark variant is derived (see smartisan_palette.dart).
 
+import 'smartisan_motion.dart';
 import 'smartisan_palette.dart';
 import 'smartisan_theme.dart';
 import 'smartisan_accent.dart';
 import 'smartisan_icons.dart';
 import 'smartisan_widgets.dart' show SIcon;
-import 'package:flutter/cupertino.dart'
-    show CupertinoPageTransitionsBuilder, CupertinoThemeData;
+
+import 'package:flutter/cupertino.dart' show CupertinoThemeData;
 import 'package:flutter/material.dart';
 
 abstract final class SmartisanMaterialTheme {
@@ -626,9 +627,7 @@ abstract final class SmartisanMaterialTheme {
           surfaceTintColor: const WidgetStatePropertyAll(Colors.transparent),
           shape: WidgetStatePropertyAll(
             RoundedRectangleBorder(
-              borderRadius: const BorderRadius.all(
-                Radius.circular(SRadii.md),
-              ),
+              borderRadius: const BorderRadius.all(Radius.circular(SRadii.md)),
               side: hair.copyWith(color: p.border),
             ),
           ),
@@ -718,9 +717,9 @@ abstract final class SmartisanMaterialTheme {
       pageTransitionsTheme: const PageTransitionsTheme(
         // Smartisan pushes pages horizontally on every platform.
         builders: {
-          TargetPlatform.android: CupertinoPageTransitionsBuilder(),
-          TargetPlatform.iOS: CupertinoPageTransitionsBuilder(),
-          TargetPlatform.macOS: CupertinoPageTransitionsBuilder(),
+          TargetPlatform.android: SPageTransitionsBuilder(),
+          TargetPlatform.iOS: SPageTransitionsBuilder(),
+          TargetPlatform.macOS: SPageTransitionsBuilder(),
         },
       ),
     );

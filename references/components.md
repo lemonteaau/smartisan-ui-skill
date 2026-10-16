@@ -130,7 +130,7 @@
 - 选中带：距井顶 81px，高 44，横贯（左右各外扩 1px），`#fff → #f5f5f5(53.5%) → #f8f8f8`，1px `#d9d9d9`。
 - 列：等分，列间 1px `rgba(206,206,206,.4)`；上下内边距 14，5 个值间距 16，16px；选中项高 38、`#55585c`，其余 `#b3b3b5`。
 - DatePicker 三列：年 / 月 / 日；TimePicker 三列：时 / 分 / 上午·下午。
-- CSS 只负责外观，滚动逻辑要自己实现（scroll-snap 或拖拽）。
+- 要真正能滚：在列上加 `data-s-wheel`（循环加 `data-s-loop`），把全部选项都放进去并给当前项 `aria-selected="true"`，引入 `smartisan.js`。之后 5 行可见，越靠近选中带字越大（16→18）越深（`#b3b3b5`→`#55585c`），支持拖动、甩动、滚轮和方向键，松手 200ms 吸附，值变化时在列上触发 `change`（`event.detail = {index, value}`）。Flutter：`SWheelPicker`。
 
 ## 7. Dialog（`248:871`）
 ```html
@@ -140,7 +140,7 @@
   <div class="s-dialog__actions"><button>取消</button><button data-primary>确定</button></div>
 </div></div>
 ```
-- 用 `hidden` 属性控制显示和隐藏（`.s-overlay[hidden]` 已经处理），出现时有 0.15s 淡入；配合 `smartisan.js` 可以用 `data-s-open` / `data-s-close` 开关，点遮罩或按 Esc 关闭（加 `data-s-modal` 可禁止）。
+- 用 `hidden` 属性控制显示和隐藏（`.s-overlay[hidden]` 已经处理）。出现时遮罩淡入、卡片从 0.85 缩放淡入（250ms decelerate）；用 `smartisan.js` 关闭时 150ms 加速退出。`data-s-open` / `data-s-close` 开关，点遮罩或按 Esc 关闭（加 `data-s-modal` 可禁止）。
 - 遮罩 `rgba(0,0,0,.6)`；对话框宽 368（在 432 宽屏幕上左右各留 32）。
 - **Dialog Header**（`171:272`）：高 48，底 `#fafafa`，底线 1px `#ededed`，上圆角 12，18px 700 `#636363` 居中。
 - **Content**：白底，内边距 20，16px / 行高 24 `#656565`。
@@ -206,9 +206,9 @@
   <div class="s-list-item">…</div>
 </div>
 ```
-- 列表行左滑露出操作托盘：内边距 16，图标 24px 间距 20，0.5px `#c7c7c7` 描边，内阴影 `inset 0 0 4px rgba(0,0,0,.16)`（凹槽感）。
+- 托盘在**左侧**：Smartisan 的列表行是**向右滑**，行右移露出左边的操作托盘（音乐、时钟、便签都这样），不是 iOS 的左滑。托盘内边距 16，图标 24px 间距 20，0.5px `#c7c7c7` 描边，内阴影 `inset 0 0 4px rgba(0,0,0,.16)`（凹槽感）。
 - 行本身：白底，1px `#e2e2e2` 描边，左 18.4 / 右 11.2，尾部示例为开关。
-- 滑动交互要自己实现（translateX），CSS 只负责外观。
+- 静态写法就是展开态。要手势时加 `data-s-swipe` 并引入 `smartisan.js`：跟手到托盘宽度，之后 1/5 阻尼；松手过 1/4 展开（150–200ms），否则收回；同时只开一行，点别处先收起并吃掉这次点击。删除按钮加 `data-s-swipe-delete`：行滑出后 200ms 收拢并移除，触发 `s-delete` 事件。Flutter：`SSwipeRow`。
 
 ## 11. Switch · `.s-switch`（`42:1333`）
 ```html
@@ -220,6 +220,7 @@
   - selected=true：旋钮在右，左侧露出蓝点 `#9cbcff→#7da7ff`（描边 `#769dfe`）。
   - selected=false：旋钮在左，右侧露出灰点 `#f4f4f4`（描边 `#e8e8e8`）。
 - 原始矢量：`assets/kit-renders/switch-*.svg`。
+- 手感（SwitchEx，需 `smartisan.js`）：点一下切换；也可以拖拇指，移动超过 8dp 或按住超过 300ms 时按拇指位置决定。归位是 350dp/s 的**线性**移动（满程约 84ms），按下时拨钮变按下渐变。禁用 75% 不透明度。
 
 ## 12. Popup Menu · `.s-menu`（`253:2463`），Item（`175:1583`）
 - 宽 220，圆角 6，0.4px `#e2e2e2`，overflow hidden。
@@ -257,3 +258,64 @@
 - 彩色：`si-c-check si-c-redcheck si-c-delete si-c-unselected si-c-clear si-c-radio-on si-c-radio-off`
 - 默认颜色：一般图标 `#929292`（原稿是 `#8c8c8c→#989898` 渐变），禁用/底部导航未选中 `#c7c7c7`，`>` 箭头 `#b2b2b2`，"更多" `#bababa`，加号 `#c9cbcf`，静音/音量 `#808080`（原稿 `#666→#999`）。
 - 线性图标描边 2px，圆头圆角；尺寸为 16 / 18 / 20 / 22 / 24 / 28。
+
+## 18. 框架层组件（Kit 没画，系统应用常用）
+
+数值和出处见 `motion.md`。除样式外的行为都需要 `smartisan.js`。
+
+### 底部菜单 · `.s-overlay.s-overlay--sheet` + `.s-sheet`
+```html
+<div class="s-overlay s-overlay--sheet" id="del" hidden>
+  <div class="s-sheet">
+    <div class="s-sheet__header"><span class="s-sheet__spacer"></span><span class="s-sheet__title">清除后无法恢复</span><button data-s-close>…×</button></div>
+    <div class="s-sheet__body" style="gap:18px;padding:18px 18px 24px">
+      <button class="s-btn s-btn--sheet s-btn--danger s-btn--block">清除全部记录</button>
+    </div>
+  </div>
+</div>
+```
+- 从底部滑入 300ms decelerate，滑出 250ms accelerate，遮罩独立淡入淡出。
+- 框架版式（MenuDialog）：标题 13.5sp 粗体 `#99000000`，最多两行，右侧 ×（有确认时左 ×、右 ✓）；正文 `#f5f5f5`，左右 18、上 18、下 24；按钮 48、17sp 粗体、间距 18。Kit 的数值（22 / 20 / 40、间距 20）也可以，二选一保持一致。
+- `.s-btn--danger`：红色长按钮 `#e66359→#e55f55`，0.8px `#d2463c`，白字；按下 `#df4f46`。
+
+### 页面栈 · `.s-stack`
+```html
+<header class="s-appbar s-appbar--shadow" id="bar">
+  <button data-s-back hidden>…←</button><span class="s-appbar__spacer"></span><span class="s-appbar__title">设置</span>
+  <div class="s-appbar__actions"><button data-s-page="home">…🔍</button></div>
+</header>
+<div class="s-stack" data-s-appbar="bar">
+  <div class="s-stack__page" id="home" data-title="设置">… <a class="s-list-item" data-s-push="detail">…</a></div>
+  <div class="s-stack__page" id="detail" data-title="通知" hidden>…</div>
+</div>
+```
+- 推入 300ms：新页空白滑入、内容最后 40% 淡入，旧页左移 1/3 并变暗；返回 270ms 减速。
+- 有 `data-s-appbar` 时标题栏不动：标题交叉淡出淡入（各 150ms），`data-s-back` 延迟 100ms 从右侧滑入；`data-s-page="页 id"` 的按钮只在那一页出现。
+- JS：`Smartisan.push(stack, pageId)` / `Smartisan.pop(stack)`；进入页面时触发 `s-page`。
+
+### 全屏页 · `.s-modal-page`
+设置、编辑器、搜索、"新建…"用它：`<div class="s-modal-page" id="new" hidden>…</div>`，`data-s-open="new"` 打开，里面的 `data-s-close` 关闭。从底部升起 300ms（decelerate cubic），下面的页面不动；关闭时向下滑出。放在手机外框里用 `--in-frame`。
+
+### 回弹 · `.s-elastic`
+`<div class="s-elastic" style="height:…"><div class="s-elastic__content">…</div></div>`。触屏上拉到头会橡皮筋位移（阻尼公式见 `motion.md`），松手 250ms 弹回。
+
+### 字母索引条 · `.s-quickbar`
+放在 `position:relative` 的列表容器里：`<div class="s-quickbar"></div>`（空的会自动填 A–Z#）。按住出现浅底和阴影，当前字母变蓝并显示气泡；每换一个字母在条上触发 `s-letter`（`event.detail` 是字母）。宽 34，字母 10px 粗体 `#9a9a9a`。
+
+### 分区标题条 · `.s-section-title`
+30 高，`#f5f5f5` 底，左 12，12px `#9d9d9d`。用在通栏列表（联系人、文件）上方，不和卡片分组混用。
+
+### 空状态 · `.s-empty`
+```html
+<div class="s-empty"><svg class="s-empty__icon">…粗圆环或浅灰字形…</svg><div class="s-empty__title">还没有内容</div><div class="s-empty__desc">说明</div></div>
+```
+图形 120（字形图标用 96）浅灰 `#d6d6d6`；标题 16 粗体 `#bababa`，上距 18；说明 12 `#c8c8c8`，上距 5；左右各 60。
+
+### 多选 · `.s-check`、选中行
+`<input type="checkbox" class="s-check">`：22 圆；关是 1.2px `#c9c9c9` 细圈，开是蓝色实心圆 + 白勾；`--red` 用于"选中删除"。编辑态里勾选的行加 `aria-selected="true"`（或 `.is-selected`），整行 `#e5eeff`，文字颜色不变。
+
+### 增删按钮 · `.s-round-add` / `.s-round-remove`
+22 圆，绿 `#a5d65c→#8fc445` 白 +，红 `#ec6a60→#e3564c` 白 −；用在编辑列表的行首。
+
+### 标题栏图标
+`.s-appbar` 里的图标按钮按住时图标变深并弹性放大到 1.33 倍（spring 曲线 260ms），松手弹回；红色栏里图标变成 70% 白。纯 CSS，不需要 JS。

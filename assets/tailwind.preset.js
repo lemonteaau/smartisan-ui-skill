@@ -68,7 +68,17 @@ module.exports = {
       },
       fontFamily: { s: ['Smartisan Compact', 'Inter', '-apple-system', 'BlinkMacSystemFont', 'PingFang SC', 'Noto Sans CJK SC', 'Source Han Sans SC', 'Hiragino Sans GB', 'Noto Sans SC', 'Microsoft YaHei', 'sans-serif'] },
       fontSize: { 's-nav': '8px', 's-12': '12px', 's-14': '14px', 's-16': '16px', 's-18': '18px', 's-48': '48px' },
-      spacing: { 's-screen': '432px', 's-row': '60px', 's-bar': '48px', 's-action': '54px' }
+      spacing: {
+        's-screen': '432px', 's-row': '60px', 's-bar': '48px', 's-action': '54px',
+        // framework 6dp grid
+        's-1': '6px', 's-2': '12px', 's-3': '18px', 's-4': '24px', 's-5': '30px', 's-6': '36px', 's-8': '48px', 's-10': '60px'
+      },
+      transitionTimingFunction: {
+        's-smooth': 'cubic-bezier(0.37, 0, 0.63, 1)', 's-decel': 'cubic-bezier(0.5, 1, 0.89, 1)',
+        's-decel-cubic': 'cubic-bezier(0.33, 1, 0.68, 1)', 's-accel': 'cubic-bezier(0.11, 0, 0.5, 0)',
+        's-spring': 'cubic-bezier(0.34, 1.7, 0.6, 1)'
+      },
+      transitionDuration: { 's-press': '64ms', 's-fast': '150ms', 's-swipe': '200ms', 's-base': '300ms' }
     }
   }
 };

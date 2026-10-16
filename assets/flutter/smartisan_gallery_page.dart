@@ -1,6 +1,7 @@
 import 'smartisan_material_theme.dart';
 import 'smartisan_palette.dart';
 import 'smartisan_widgets.dart';
+
 import 'package:flutter/material.dart';
 
 /// Standalone visual playground. The coordinator can expose it on any route.
@@ -20,6 +21,8 @@ class _SmartisanGalleryPageState extends State<SmartisanGalleryPage> {
   int _nav = 0;
   int _radio = 0;
   final _wheel = [1, 1];
+  final _checked = <int>{0};
+  final _alarms = ['07:30', '09:00'];
 
   void _setSwitch(bool value) => setState(() => _switch = value);
   void _setSlider(double value) => setState(() => _slider = value);
@@ -350,6 +353,111 @@ class _SmartisanGalleryPageState extends State<SmartisanGalleryPage> {
                         ],
                         selected: _wheel,
                         onChanged: (c, i) => setState(() => _wheel[c] = i),
+                      ),
+                    ],
+                  ),
+                  _GallerySection(
+                    title: '交互：右滑删除、多选、空状态、转场',
+                    children: [
+                      SListGroup(
+                        children: [
+                          for (final a in _alarms)
+                            SSwipeRow(
+                              key: ValueKey(a),
+                              actions: SRoundEditButton.remove(
+                                onTap: () => setState(() => _alarms.remove(a)),
+                              ),
+                              child: SListTile(
+                                title: a,
+                                subtitle: '向右滑动可删除',
+                                trailing: SSwitch(
+                                  value: true,
+                                  onChanged: (_) {},
+                                ),
+                              ),
+                            ),
+                        ],
+                      ),
+                      SListGroup(
+                        children: [
+                          for (var i = 0; i < 3; i++)
+                            SListTile(
+                              title: '多选行 ${i + 1}',
+                              selected: _checked.contains(i),
+                              leadingWidget: SCheck(
+                                value: _checked.contains(i),
+                                onChanged: (v) => setState(
+                                  () =>
+                                      v ? _checked.add(i) : _checked.remove(i),
+                                ),
+                              ),
+                              onTap: () => setState(
+                                () => _checked.contains(i)
+                                    ? _checked.remove(i)
+                                    : _checked.add(i),
+                              ),
+                            ),
+                        ],
+                      ),
+                      Row(
+                        children: [
+                          Expanded(
+                            child: SButton(
+                              '横推',
+                              kind: SButtonKind.sheet,
+                              onPressed: () => Navigator.of(context).push(
+                                SPageRoute(
+                                  builder: (_) => Scaffold(
+                                    appBar: SAppBar(
+                                      title: '详情',
+                                      shadow: true,
+                                      onBack: () => Navigator.of(context).pop(),
+                                    ),
+                                    body: const SEmptyState(
+                                      title: '还没有内容',
+                                      description: '新页面先空白滑入，内容在最后 40% 淡入',
+                                    ),
+                                  ),
+                                ),
+                              ),
+                            ),
+                          ),
+                          const SizedBox(width: 12),
+                          Expanded(
+                            child: SButton(
+                              '全屏页上推',
+                              kind: SButtonKind.sheet,
+                              onPressed: () => Navigator.of(context).push(
+                                SModalPageRoute(
+                                  builder: (ctx) => Scaffold(
+                                    appBar: SAppBar(
+                                      title: '新建',
+                                      onBack: () => Navigator.of(ctx).pop(),
+                                    ),
+                                    body: const SEmptyState(
+                                      title: '从底部升起 300ms',
+                                    ),
+                                  ),
+                                ),
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
+                      SButton(
+                        '清除全部记录',
+                        kind: SButtonKind.danger,
+                        onPressed: () => showSBottomSheet<int>(
+                          context,
+                          title: '清除后无法恢复',
+                          options: const [
+                            SDialogAction(
+                              '清除全部记录',
+                              value: 1,
+                              destructive: true,
+                            ),
+                          ],
+                        ),
                       ),
                     ],
                   ),

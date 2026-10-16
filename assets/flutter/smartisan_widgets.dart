@@ -10,9 +10,11 @@ import 'dart:async';
 import 'dart:math' as math;
 
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart' show HapticFeedback;
 
 import 'smartisan_component_theme.dart';
 import 'smartisan_icons.dart';
+import 'smartisan_motion.dart';
 import 'smartisan_palette.dart';
 import 'smartisan_theme.dart';
 
@@ -20,6 +22,8 @@ export 'smartisan_adapters.dart';
 export 'smartisan_bars.dart';
 export 'smartisan_glyphs.dart';
 export 'smartisan_icons.dart';
+export 'smartisan_interaction.dart';
+export 'smartisan_motion.dart';
 export 'smartisan_tabs.dart';
 export 'smartisan_theme.dart';
 
@@ -177,17 +181,22 @@ class _StripePainter extends CustomPainter {
   bool shouldRepaint(_StripePainter old) => old.palette != palette;
 }
 
-/// Tracks pointer-down state to render pressed styles (no ripple).
+/// Tracks pointer-down state to render pressed styles (no ripple), with Android's timing:
+/// buttons press on touch-down; list rows ([delayed]) press after the 100ms tap timeout so a
+/// fling never flashes rows blue; a quick tap stays visibly pressed for at least 64ms
+/// (ViewConfiguration.getPressedStateDuration); starting a scroll cancels at once.
 class SPressable extends StatefulWidget {
   const SPressable({
     super.key,
     required this.builder,
     this.onTap,
     this.enabled = true,
+    this.delayed = false,
   });
   final Widget Function(BuildContext context, bool pressed) builder;
   final VoidCallback? onTap;
   final bool enabled;
+  final bool delayed;
 
   @override
   State<SPressable> createState() => _SPressableState();
@@ -195,22 +204,63 @@ class SPressable extends StatefulWidget {
 
 class _SPressableState extends State<SPressable> {
   bool _down = false;
+  DateTime? _shownAt;
+  Timer? _off;
+
   void _set(bool v) {
     if (mounted && _down != v) setState(() => _down = v);
+  }
+
+  void _show() {
+    _off?.cancel();
+    _shownAt = DateTime.now();
+    _set(true);
+  }
+
+  void _hide({bool now = false}) {
+    _off?.cancel();
+    final shown = _shownAt;
+    final left = now || shown == null
+        ? Duration.zero
+        : SMotion.pressedMin - DateTime.now().difference(shown);
+    if (left <= Duration.zero) {
+      _set(false);
+    } else {
+      _off = Timer(left, () => _set(false));
+    }
+  }
+
+  @override
+  void dispose() {
+    _off?.cancel();
+    super.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
     final active = widget.enabled && widget.onTap != null;
-    return GestureDetector(
-      behavior: HitTestBehavior.opaque,
-      onTapDown: active ? (_) => _set(true) : null,
-      onTapUp: active ? (_) => _set(false) : null,
-      onTapCancel: active ? () => _set(false) : null,
-      onTap: active ? widget.onTap : null,
-      child: MouseRegion(
-        cursor: active ? SystemMouseCursors.click : MouseCursor.defer,
-        child: widget.builder(context, _down),
+    return Listener(
+      onPointerDown: active && !widget.delayed ? (_) => _show() : null,
+      child: GestureDetector(
+        behavior: HitTestBehavior.opaque,
+        // TapGestureRecognizer reports onTapDown after kPressTimeout (100ms) or on release.
+        onTapDown: active
+            ? (_) {
+                if (!_down) _show();
+              }
+            : null,
+        onTapUp: active
+            ? (_) {
+                if (!_down) _show();
+                _hide();
+              }
+            : null,
+        onTapCancel: active ? () => _hide(now: true) : null,
+        onTap: active ? widget.onTap : null,
+        child: MouseRegion(
+          cursor: active ? SystemMouseCursors.click : MouseCursor.defer,
+          child: widget.builder(context, _down),
+        ),
       ),
     );
   }
@@ -232,7 +282,8 @@ class SDivider extends StatelessWidget {
 // ============================================================================================
 
 /// 48dp bar, centred bold title, back on the left, actions (gap 18) on the right.
-/// [red] = brand red bar (white title/icons). [shadow] = the 8dp fade measured on a real R2.
+/// [red] = brand red bar (white title/icons). [shadow] = the real-device look: no hairline, a 14dp
+/// fade instead (title_bar_shadow, alpha 12 → 0).
 class SAppBar extends StatelessWidget implements PreferredSizeWidget {
   const SAppBar({
     super.key,
@@ -248,7 +299,7 @@ class SAppBar extends StatelessWidget implements PreferredSizeWidget {
   final bool red, shadow;
 
   @override
-  Size get preferredSize => Size.fromHeight(SDims.appBar + (shadow ? 8 : 0));
+  Size get preferredSize => Size.fromHeight(SDims.appBar + (shadow ? 14 : 0));
 
   @override
   Widget build(BuildContext context) {
@@ -259,12 +310,16 @@ class SAppBar extends StatelessWidget implements PreferredSizeWidget {
       decoration: BoxDecoration(
         color: red ? null : context.sp.appBar,
         gradient: red ? context.sp.redBarGradient : null,
-        border: Border(
-          bottom: BorderSide(
-            color: red ? context.sp.appBarRedBorder : context.sp.appBarBorder,
-            width: 1,
-          ),
-        ),
+        border: shadow && !red
+            ? null
+            : Border(
+                bottom: BorderSide(
+                  color: red
+                      ? context.sp.appBarRedBorder
+                      : context.sp.appBarBorder,
+                  width: 1,
+                ),
+              ),
       ),
       child: IconTheme(
         data: IconThemeData(color: fg),
@@ -307,13 +362,15 @@ class SAppBar extends StatelessWidget implements PreferredSizeWidget {
       children: [
         bar,
         Container(
-          height: 8,
+          height: 14,
           decoration: BoxDecoration(
             gradient: LinearGradient(
               begin: Alignment.topCenter,
               end: Alignment.bottomCenter,
+              stops: const [0, .7, 1],
               colors: [
-                context.sp.shadow.withValues(alpha: 11 / 255),
+                context.sp.shadow.withValues(alpha: 12 / 255),
+                context.sp.shadow.withValues(alpha: 1 / 255),
                 context.sp.shadow.withValues(alpha: 0),
               ],
             ),
@@ -324,7 +381,8 @@ class SAppBar extends StatelessWidget implements PreferredSizeWidget {
   }
 }
 
-/// Bare icon button for bars/headers (colour change on press).
+/// Bare icon button for bars/headers. Like TitleBar's bar-icon touch listener: while held the glyph
+/// darkens and pops to 1.33x on a spring, then springs back. No background highlight.
 class SIconButtonPlain extends StatelessWidget {
   const SIconButtonPlain({
     super.key,
@@ -338,25 +396,40 @@ class SIconButtonPlain extends StatelessWidget {
   final double size;
   final Color? color;
   @override
-  Widget build(BuildContext context) => SPressable(
-    onTap: onTap,
-    builder: (context, p) => Opacity(
-      opacity: p ? .5 : 1,
-      child: Padding(
-        padding: const EdgeInsets.all(2),
-        child: SIcon(icon, size: size, color: color),
+  Widget build(BuildContext context) {
+    final base = color ?? IconTheme.of(context).color ?? context.sp.icon;
+    final light = base.computeLuminance() > .6;
+    return SPressable(
+      onTap: onTap,
+      builder: (context, p) => AnimatedScale(
+        scale: p ? SMotion.barIconScale : 1,
+        duration: SMotion.barIconSpring,
+        curve: Curves.easeOutBack,
+        child: Padding(
+          padding: const EdgeInsets.all(2),
+          child: SIcon(
+            icon,
+            size: size,
+            color: !p
+                ? base
+                : light
+                ? base.withValues(alpha: .7)
+                : Color.lerp(base, const Color(0xFF000000), .35),
+          ),
+        ),
       ),
-    ),
-  );
+    );
+  }
 }
 
 // ============================================================================================
 // Buttons
 // ============================================================================================
 
-enum SButtonKind { primary, small, sheet, outline, text }
+enum SButtonKind { primary, small, sheet, outline, text, danger }
 
-/// Elevated (primary, 60dp), small elevated (30dp), bottom-sheet white (48dp), outlined (30dp), text.
+/// Elevated (primary, 60dp), small elevated (30dp), bottom-sheet white (48dp), outlined (30dp), text,
+/// danger (long_btn_red: red, white bold text, 48dp — the destructive button of a bottom menu).
 class SButton extends StatelessWidget {
   const SButton(
     this.label, {
@@ -437,6 +510,24 @@ class SButton extends StatelessWidget {
             style = SText.buttonSmall.copyWith(color: context.sp.outlinedText);
             height = SDims.buttonSmall;
             padding = const EdgeInsets.symmetric(horizontal: 28);
+          case SButtonKind.danger:
+            deco = BoxDecoration(
+              color: p ? const Color(0xFFDF4F46) : null,
+              gradient: p
+                  ? null
+                  : const LinearGradient(
+                      begin: Alignment.topCenter,
+                      end: Alignment.bottomCenter,
+                      colors: [Color(0xFFE66359), Color(0xFFE55F55)],
+                    ),
+              border: Border.all(
+                color: p ? const Color(0xFFC43C33) : const Color(0xFFD2463C),
+                width: SHair.md,
+              ),
+              borderRadius: BorderRadius.circular(SRadii.sheetButton),
+            );
+            style = SText.buttonLarge.copyWith(color: const Color(0xFFFFFFFF));
+            height = SDims.buttonSheet;
           case SButtonKind.text:
             return Opacity(
               opacity: p ? .6 : 1,
@@ -454,7 +545,10 @@ class SButton extends StatelessWidget {
           child: Text(label, style: style),
         );
         final sized =
-            expand && (kind == SButtonKind.primary || kind == SButtonKind.sheet)
+            expand &&
+                (kind == SButtonKind.primary ||
+                    kind == SButtonKind.sheet ||
+                    kind == SButtonKind.danger)
             ? SizedBox(width: double.infinity, child: box)
             : box;
         return Opacity(opacity: enabled ? 1 : .3, child: sized);
@@ -744,6 +838,8 @@ class SListTile extends StatelessWidget {
     this.onTap,
     this.enabled = true,
     this.showChevron,
+    this.selected = false,
+    this.leadingWidget,
   });
   final String title;
   final String? subtitle;
@@ -754,12 +850,19 @@ class SListTile extends StatelessWidget {
   final bool enabled;
   final bool? showChevron;
 
+  /// Multi-select (edit mode): checked rows get a light accent tint; text keeps its colour.
+  final bool selected;
+
+  /// Any leading widget (e.g. an [SCheck] in edit mode); used instead of [leading].
+  final Widget? leadingWidget;
+
   @override
   Widget build(BuildContext context) {
     final iconColor = IconTheme.of(context).color ?? context.sp.icon;
     return SPressable(
       onTap: onTap,
       enabled: enabled,
+      delayed: true,
       builder: (context, p) {
         final fg = p
             ? Theme.of(context).colorScheme.onPrimary
@@ -769,14 +872,24 @@ class SListTile extends StatelessWidget {
           constraints: const BoxConstraints(minHeight: SDims.listRow),
           padding: const EdgeInsets.only(left: 18, right: 12),
           decoration: BoxDecoration(
-            color: p ? context.sp.rowPressed : context.sp.card,
+            color: p
+                ? context.sp.rowPressed
+                : selected
+                ? Color.alphaBlend(
+                    context.sp.accent.withValues(alpha: .15),
+                    context.sp.card,
+                  )
+                : context.sp.card,
             border: p
                 ? Border.all(color: context.sp.accentBorder, width: SHair.xs)
                 : null,
           ),
           child: Row(
             children: [
-              if (leading != null) ...[
+              if (leadingWidget != null) ...[
+                leadingWidget!,
+                const SizedBox(width: 18),
+              ] else if (leading != null) ...[
                 SIcon(
                   leading!,
                   size: 20,
@@ -877,6 +990,9 @@ class SListTileSimple extends StatelessWidget {
 // ============================================================================================
 
 /// 52×24 recessed track, white thumb, indicator dot on the free side (blue when on, grey when off).
+/// Behaves like SwitchEx: tap toggles; the thumb can be dragged and lands on the nearer side; the
+/// settle is linear at 350dp/s (≈80ms end to end); a light haptic tick when the value changes;
+/// disabled = 75% opacity.
 class SSwitch extends StatefulWidget {
   const SSwitch({super.key, required this.value, required this.onChanged});
   final bool value;
@@ -886,95 +1002,170 @@ class SSwitch extends StatefulWidget {
   State<SSwitch> createState() => _SSwitchState();
 }
 
-class _SSwitchState extends State<SSwitch> {
-  double _dragDelta = 0;
+class _SSwitchState extends State<SSwitch> with SingleTickerProviderStateMixin {
+  static const double _travel = 28;
+  late final AnimationController _pos = AnimationController(
+    vsync: this,
+    value: widget.value ? 1 : 0,
+  );
+  double _dragStart = 0;
+  Offset? _down;
+  Duration? _downAt;
+  bool _dragging = false, _scrolling = false;
 
-  void _finishDrag(DragEndDetails details) {
-    if (_dragDelta.abs() < 4) return;
-    final next = _dragDelta > 0;
-    if (next != widget.value) widget.onChanged?.call(next);
-    _dragDelta = 0;
+  void _settle(bool on) {
+    final target = on ? 1.0 : 0.0;
+    final ms = ((target - _pos.value).abs() * _travel / 350 * 1000).round();
+    _pos.animateTo(
+      target,
+      duration: Duration(milliseconds: ms.clamp(1, 1000)),
+      curve: Curves.linear,
+    );
+  }
+
+  void _commit(bool next) {
+    _settle(next);
+    if (next != widget.value) {
+      HapticFeedback.lightImpact();
+      widget.onChanged?.call(next);
+    }
+  }
+
+  @override
+  void didUpdateWidget(SSwitch old) {
+    super.didUpdateWidget(old);
+    if (!_dragging && old.value != widget.value) _settle(widget.value);
+  }
+
+  @override
+  void dispose() {
+    _pos.dispose();
+    super.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
-    final value = widget.value;
     final onChanged = widget.onChanged;
     final r = BorderRadius.circular(SRadii.pill);
     return Semantics(
-      toggled: value,
+      toggled: widget.value,
       enabled: onChanged != null,
-      child: GestureDetector(
+      // SwitchEx decides on release: moved past the 8dp touch slop or held ≥ 300ms → the thumb's
+      // position wins; otherwise it is a tap and toggles. Raw pointers, because Flutter's drag
+      // slop (18dp) would turn a small drag into a tap.
+      child: Listener(
         behavior: HitTestBehavior.opaque,
-        onTap: onChanged == null ? null : () => onChanged(!value),
-        onHorizontalDragStart: onChanged == null ? null : (_) => _dragDelta = 0,
-        onHorizontalDragUpdate: onChanged == null
+        onPointerDown: onChanged == null
             ? null
-            : (d) => _dragDelta += d.delta.dx,
-        onHorizontalDragEnd: onChanged == null ? null : _finishDrag,
-        onHorizontalDragCancel: onChanged == null ? null : () => _dragDelta = 0,
+            : (e) {
+                _pos.stop();
+                _down = e.position;
+                _downAt = e.timeStamp;
+                _dragStart = _pos.value;
+                _dragging = false;
+                _scrolling = false;
+              },
+        onPointerMove: onChanged == null
+            ? null
+            : (e) {
+                final d = e.position - (_down ?? e.position);
+                if (!_dragging && !_scrolling) {
+                  if (d.dy.abs() > 8 && d.dy.abs() > d.dx.abs()) {
+                    _scrolling =
+                        true; // the list is scrolling: leave the switch alone
+                  } else if (d.dx.abs() > 8) {
+                    _dragging = true;
+                  }
+                }
+                if (_dragging) {
+                  _pos.value = (_dragStart + d.dx / _travel).clamp(0.0, 1.0);
+                }
+              },
+        onPointerUp: onChanged == null
+            ? null
+            : (e) {
+                final held = e.timeStamp - (_downAt ?? e.timeStamp);
+                final wasDragging = _dragging;
+                _dragging = false;
+                if (_scrolling) return _settle(widget.value);
+                if (wasDragging || held >= const Duration(milliseconds: 300)) {
+                  _commit(_pos.value > .5);
+                } else {
+                  _commit(!widget.value);
+                }
+              },
+        onPointerCancel: onChanged == null
+            ? null
+            : (_) {
+                _dragging = false;
+                _settle(widget.value);
+              },
         child: Opacity(
-          opacity: onChanged == null ? .4 : 1,
+          opacity: onChanged == null ? .75 : 1,
           child: SizedBox.fromSize(
             size: SDims.switchSize,
-            child: Stack(
-              clipBehavior: Clip.none,
-              children: [
-                Positioned.fill(
-                  child: SInsetShadow(
-                    shadows: context.sp.insetSwitchShadow,
-                    borderRadius: r,
-                    child: DecoratedBox(
-                      decoration: BoxDecoration(
-                        color: context.sp.switchGroove,
+            child: AnimatedBuilder(
+              animation: _pos,
+              builder: (context, _) {
+                final on = _pos.value > .5;
+                return Stack(
+                  clipBehavior: Clip.none,
+                  children: [
+                    Positioned.fill(
+                      child: SInsetShadow(
+                        shadows: context.sp.insetSwitchShadow,
                         borderRadius: r,
-                        border: Border.all(
-                          color: context.sp.border,
-                          width: SHair.xs,
+                        child: DecoratedBox(
+                          decoration: BoxDecoration(
+                            color: context.sp.switchGroove,
+                            borderRadius: r,
+                            border: Border.all(
+                              color: context.sp.border,
+                              width: SHair.xs,
+                            ),
+                          ),
                         ),
                       ),
                     ),
-                  ),
-                ),
-                Positioned(
-                  left: value ? 7.9 : 34.5,
-                  top: 7.2,
-                  child: Container(
-                    width: 9.6,
-                    height: 9.6,
-                    decoration: BoxDecoration(
-                      shape: BoxShape.circle,
-                      color: value ? null : context.sp.switchDotOff,
-                      gradient: value ? context.sp.switchDotGradient : null,
-                      border: Border.all(
-                        color: value
-                            ? context.sp.switchDotBorderOn
-                            : context.sp.switchDotBorderOff,
-                        width: SHair.xs,
+                    Positioned(
+                      left: on ? 7.9 : 34.5,
+                      top: 7.2,
+                      child: Container(
+                        width: 9.6,
+                        height: 9.6,
+                        decoration: BoxDecoration(
+                          shape: BoxShape.circle,
+                          color: on ? null : context.sp.switchDotOff,
+                          gradient: on ? context.sp.switchDotGradient : null,
+                          border: Border.all(
+                            color: on
+                                ? context.sp.switchDotBorderOn
+                                : context.sp.switchDotBorderOff,
+                            width: SHair.xs,
+                          ),
+                        ),
                       ),
                     ),
-                  ),
-                ),
-                AnimatedPositioned(
-                  duration: const Duration(milliseconds: 180),
-                  curve: Curves.easeOut,
-                  left: value ? 28 : 0,
-                  top: 0,
-                  child: Container(
-                    width: 24,
-                    height: 24,
-                    decoration: BoxDecoration(
-                      shape: BoxShape.circle,
-                      gradient: context.sp.knob,
-                      border: Border.all(
-                        color: context.sp.border,
-                        width: SHair.xs,
+                    Positioned(
+                      left: _pos.value * _travel,
+                      top: 0,
+                      child: Container(
+                        width: 24,
+                        height: 24,
+                        decoration: BoxDecoration(
+                          shape: BoxShape.circle,
+                          gradient: context.sp.knob,
+                          border: Border.all(
+                            color: context.sp.border,
+                            width: SHair.xs,
+                          ),
+                          boxShadow: context.sp.barShadow,
+                        ),
                       ),
-                      boxShadow: context.sp.barShadow,
                     ),
-                  ),
-                ),
-              ],
+                  ],
+                );
+              },
             ),
           ),
         ),
@@ -1350,10 +1541,18 @@ class STextField extends StatelessWidget {
 // ============================================================================================
 
 class SDialogAction<T> {
-  const SDialogAction(this.label, {this.value, this.primary = false});
+  const SDialogAction(
+    this.label, {
+    this.value,
+    this.primary = false,
+    this.destructive = false,
+  });
   final String label;
   final T? value;
   final bool primary;
+
+  /// In a bottom menu: the red [SButtonKind.danger] button.
+  final bool destructive;
 }
 
 /// The dialog card: 368dp, grey header (48dp), white body, 54dp action row (primary on the right).
@@ -1497,30 +1696,27 @@ Future<T?> showSDialog<T>(
     from: context,
     to: Navigator.of(context, rootNavigator: true).context,
   );
-  return showGeneralDialog<T>(
-    context: context,
-    barrierDismissible: barrierDismissible,
-    barrierLabel: 'dismiss',
-    barrierColor: context.sp.scrim,
-    transitionDuration: const Duration(milliseconds: 150),
-    transitionBuilder: (context, anim, secondary, child) =>
-        FadeTransition(opacity: anim, child: child),
-    pageBuilder: (ctx, anim, secondary) => themes.wrap(
-      Center(
-        child: Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 32),
-          child: SDialog(
-            title: title,
-            body: body,
-            flushBody: flushBody,
-            actions: [
-              for (final a in actions)
-                SDialogButton(
-                  a.label,
-                  primary: a.primary,
-                  onTap: () => Navigator.of(ctx).pop(a.value),
-                ),
-            ],
+  return Navigator.of(context, rootNavigator: true).push<T>(
+    SDialogRoute<T>(
+      barrierDismissible: barrierDismissible,
+      barrierColor: context.sp.scrim,
+      builder: (ctx) => themes.wrap(
+        Center(
+          child: Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 32),
+            child: SDialog(
+              title: title,
+              body: body,
+              flushBody: flushBody,
+              actions: [
+                for (final a in actions)
+                  SDialogButton(
+                    a.label,
+                    primary: a.primary,
+                    onTap: () => Navigator.of(ctx).pop(a.value),
+                  ),
+              ],
+            ),
           ),
         ),
       ),
@@ -1534,30 +1730,29 @@ Future<void> showSSimpleDialog(BuildContext context, String text) {
     from: context,
     to: Navigator.of(context, rootNavigator: true).context,
   );
-  return showGeneralDialog<void>(
-    context: context,
-    barrierDismissible: true,
-    barrierLabel: 'dismiss',
-    barrierColor: context.sp.scrim,
-    transitionDuration: const Duration(milliseconds: 150),
-    transitionBuilder: (context, anim, secondary, child) =>
-        FadeTransition(opacity: anim, child: child),
-    pageBuilder: (ctx, anim, secondary) => themes.wrap(
-      Builder(
-        builder: (context) => Center(
-          child: Material(
-            type: MaterialType.transparency,
-            child: Container(
-              width: 376,
-              padding: const EdgeInsets.symmetric(horizontal: 28, vertical: 40),
-              decoration: BoxDecoration(
-                color: context.sp.card,
-                borderRadius: BorderRadius.circular(SRadii.dialog),
-              ),
-              child: Text(
-                text,
-                style: SText.simpleDialog.copyWith(
-                  color: context.sp.simpleDialogText,
+  return Navigator.of(context, rootNavigator: true).push<void>(
+    SDialogRoute<void>(
+      barrierColor: context.sp.scrim,
+      builder: (ctx) => themes.wrap(
+        Builder(
+          builder: (context) => Center(
+            child: Material(
+              type: MaterialType.transparency,
+              child: Container(
+                width: 376,
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 28,
+                  vertical: 40,
+                ),
+                decoration: BoxDecoration(
+                  color: context.sp.card,
+                  borderRadius: BorderRadius.circular(SRadii.dialog),
+                ),
+                child: Text(
+                  text,
+                  style: SText.simpleDialog.copyWith(
+                    color: context.sp.simpleDialogText,
+                  ),
                 ),
               ),
             ),
@@ -1587,9 +1782,7 @@ class SSheetHeader extends StatelessWidget {
       borderRadius: const BorderRadius.vertical(
         top: Radius.circular(SRadii.sheet),
       ),
-      border: Border(
-        bottom: BorderSide(color: context.sp.border, width: 1),
-      ),
+      border: Border(bottom: BorderSide(color: context.sp.border, width: 1)),
     ),
     child: Stack(
       alignment: Alignment.center,
@@ -1633,6 +1826,13 @@ Future<T?> showSBottomSheet<T>(
     backgroundColor: Colors.transparent,
     barrierColor: context.sp.scrim,
     elevation: 0,
+    // MenuDialog: up 300ms decelerate, down 250ms accelerate.
+    sheetAnimationStyle: const AnimationStyle(
+      duration: SMotion.base,
+      reverseDuration: SMotion.sheetOut,
+      curve: SMotion.decelerate,
+      reverseCurve: SMotion.accelerate,
+    ),
     builder: (ctx) => Column(
       mainAxisSize: MainAxisSize.min,
       children: [
@@ -1646,7 +1846,9 @@ Future<T?> showSBottomSheet<T>(
                 if (i > 0) const SizedBox(height: 20),
                 SButton(
                   options[i].label,
-                  kind: SButtonKind.sheet,
+                  kind: options[i].destructive
+                      ? SButtonKind.danger
+                      : SButtonKind.sheet,
                   onPressed: () => Navigator.of(ctx).pop(options[i].value),
                 ),
               ],
@@ -1749,6 +1951,7 @@ class _Wheel extends StatefulWidget {
 }
 
 class _WheelState extends State<_Wheel> {
+  static const double _extent = 38;
   late final FixedExtentScrollController _c = FixedExtentScrollController(
     initialItem: widget.selected,
   );
@@ -1758,23 +1961,54 @@ class _WheelState extends State<_Wheel> {
     super.dispose();
   }
 
+  // SmartisanTimePickerView: flat rows (no 3-D drum), the row nearing the band grows 16 → 18 and
+  // darkens #b3b3b5 → #55585c continuously, a tick + haptic per step, edges fade over 1/6.
   @override
-  Widget build(BuildContext context) => ListWheelScrollView.useDelegate(
-    controller: _c,
-    itemExtent: 38,
-    diameterRatio: 2.2,
-    physics: const FixedExtentScrollPhysics(),
-    onSelectedItemChanged: widget.onChanged,
-    childDelegate: ListWheelChildBuilderDelegate(
-      childCount: widget.items.length,
-      builder: (_, i) => Center(
-        child: Text(
-          widget.items[i],
-          style: SText.picker.copyWith(
-            color: i == widget.selected
-                ? context.sp.pickerSelected
-                : context.sp.pickerUnselected,
-          ),
+  Widget build(BuildContext context) => ShaderMask(
+    blendMode: BlendMode.dstIn,
+    shaderCallback: (r) => const LinearGradient(
+      begin: Alignment.topCenter,
+      end: Alignment.bottomCenter,
+      stops: [0, 1 / 6, 5 / 6, 1],
+      colors: [
+        Color(0x00000000),
+        Color(0xFF000000),
+        Color(0xFF000000),
+        Color(0x00000000),
+      ],
+    ).createShader(r),
+    child: ListWheelScrollView.useDelegate(
+      controller: _c,
+      itemExtent: _extent,
+      diameterRatio: 1000,
+      physics: const FixedExtentScrollPhysics(),
+      onSelectedItemChanged: (i) {
+        HapticFeedback.selectionClick();
+        widget.onChanged(i);
+      },
+      childDelegate: ListWheelChildBuilderDelegate(
+        childCount: widget.items.length,
+        builder: (_, i) => AnimatedBuilder(
+          animation: _c,
+          builder: (context, _) {
+            final at = _c.hasClients
+                ? _c.offset / _extent
+                : widget.selected.toDouble();
+            final f = (1 - (i - at).abs()).clamp(0.0, 1.0);
+            return Center(
+              child: Text(
+                widget.items[i],
+                style: SText.picker.copyWith(
+                  fontSize: 16 + 2 * f,
+                  color: Color.lerp(
+                    context.sp.pickerUnselected,
+                    context.sp.pickerSelected,
+                    f,
+                  ),
+                ),
+              ),
+            );
+          },
         ),
       ),
     ),
@@ -1819,9 +2053,7 @@ class SPopupMenu extends StatelessWidget {
                 padding: const EdgeInsets.symmetric(horizontal: 18),
                 decoration: BoxDecoration(
                   color: p ? context.sp.divider : context.sp.card,
-                  border: Border(
-                    bottom: BorderSide(color: context.sp.divider),
-                  ),
+                  border: Border(bottom: BorderSide(color: context.sp.divider)),
                 ),
                 child: Row(
                   children: [
