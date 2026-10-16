@@ -48,9 +48,10 @@ git clone https://github.com/lemonteaau/smartisan-ui-skill ~/.claude/skills/smar
 
 - **完整 UI Kit**：17 页，所有组件、变体和状态，数值都从 Figma 原稿读出，并在 Smartisan R2 真机上校对过。
 - **网页**：`smartisan.css`（设计 token + 26 类 `.s-*` 组件）、可选的 `smartisan.js`、Tailwind preset、`tokens.json`。
-- **Flutter**：设计 token、23 个矢量图标、全套组件，不依赖任何第三方包。
+- **Flutter**：设计 token、亮/暗色板与可选强调色、完整 `ThemeData`、23 个矢量图标 + 166 个字形的图标字体、全套组件（含分段 Tab、品牌栏、带按下态的列表行、回弹滚动），不依赖任何第三方包。
 - **图标**：29 个 SVG，附带各组件里实际用到的上色版本。
 - **参考资料**：组件规格、Figma 节点清单、17 页参考截图、`demo.html` 完整复刻页。
+- **真机实测**：在 Smartisan R2 上逐像素取色、60fps 录屏得到的按下态、转场和对话框动效、回弹、分段 Tab、间距与分隔线规则（`references/device-behavior.md`）。
 
 ## 效果展示
 
@@ -81,4 +82,5 @@ git clone https://github.com/lemonteaau/smartisan-ui-skill ~/.claude/skills/smar
 
 - 设计来源：[Smartisan OS UI Kit (Unofficial)](https://www.figma.com/community/file/1419385240874679870)，作者 [Paix Chan](https://www.figma.com/@paixchan)，按 [CC BY 4.0](https://creativecommons.org/licenses/by/4.0/) 授权。图标、组件渲染图和参考截图都来自这个文件，沿用 CC BY 4.0。
 - 本仓库自己写的代码和文档使用 [MIT](LICENSE) 许可。
+- Flutter 图标字体的字形来自 [Phosphor Icons](https://phosphoricons.com)（MIT，见 `assets/flutter/glyphs/svg/LICENSE`）；其中“更多”的 `•••` 是本项目自己画的。
 - Smartisan、锤子和 T 标志是其权利人的商标。本项目是非官方爱好者作品，与锤子科技没有关系。Smartisan Compact 字体不包含在本仓库中。

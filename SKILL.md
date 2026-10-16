@@ -8,6 +8,7 @@ description: 用 Smartisan OS（锤子科技 / 坚果手机）的 UI 风格做�
 来源：
 - Figma 社区文件 [Smartisan OS UI Kit (Unofficial)](https://www.figma.com/community/file/1419385240874679870)，作者 Paix Chan，CC BY 4.0，基于 Smartisan R2 上的 Smartisan OS 8。所有数值都从 Figma 节点里读出，17 页、每个组件和每个变体都覆盖到了。
 - 在一台真机 Smartisan R2（Smartisan OS 8.5.3）上用 adb 校对：屏幕 dp 宽度、字体、真实页面底纹、App Bar 阴影、列表图标颜色等，文档里标 **[R2]**。
+- 在同一台 R2 上逐像素测量、60fps 录屏抽帧得到的**交互、动效、间距、分隔线**，以及各系统应用的取色方式，见 `references/device-behavior.md`。
 
 ## 文件
 
@@ -15,7 +16,8 @@ description: 用 Smartisan OS（锤子科技 / 坚果手机）的 UI 风格做�
 |---|---|
 | `assets/smartisan.css` | 全部 token（CSS 变量）+ 全部组件类 `.s-*`。**做网页时优先直接引用这一份** |
 | `assets/smartisan.js` | 可选的交互小工具：滑块进度自动同步、对话框开关（`data-s-open` / `data-s-close`、点遮罩和 Esc 关闭）、`Smartisan.toast()` |
-| `assets/flutter/*.dart` | **Flutter 版**：token（`smartisan_theme.dart`）、23 个矢量图标（`smartisan_icons.dart`）、全部组件（`smartisan_widgets.dart`），只依赖 Flutter SDK。用法见 `references/flutter.md` |
+| `assets/flutter/*.dart` | **Flutter 版**（只依赖 Flutter SDK）：Kit token（`smartisan_theme.dart`）、亮/暗色板 + 强调色（`smartisan_palette.dart`、`smartisan_accent.dart`）、整套 `ThemeData`（`smartisan_material_theme.dart`）、23 个矢量图标、全部组件（明暗自适应）、真机补充组件（分段 Tab、品牌栏、条纹底、分区带、带按下态的列表行、动效）。用法见 `references/flutter.md` |
+| `assets/flutter/glyphs/` | Flutter 图标字体 `SGlyphs`：166 个锤子风格实心字形（Phosphor Icons，MIT），用来替换 Material 线框图标 |
 | `assets/demo.html` | 整套 Kit 的 1:1 复刻：17 页，每个变体都有，外加一块"Real device"展示板。拿不准 HTML 结构时照抄这里 |
 | `assets/icons-sprite.svg` | 29 个图标的 `<symbol>`：单色 `si-*`（`currentColor`）+ 彩色 `si-c-*`。内联到 `<body>` 开头后用 `<svg class="s-icon"><use href="#si-back"/></svg>` |
 | `assets/icons/*.svg` | 29 个原始图标（保留原渐变） |
@@ -27,6 +29,7 @@ description: 用 Smartisan OS（锤子科技 / 坚果手机）的 UI 风格做�
 | `references/tokens.md` | 颜色 / 渐变 / 字体 / 圆角 / 描边 / 阴影 / 尺寸全表，含 [R2] 实测值 |
 | `references/components.md` | 每个组件的 HTML 结构、尺寸、所有状态的取值 |
 | `references/flutter.md` | Flutter 接入步骤、CSS→Flutter 组件对照、常见错误 |
+| `references/device-behavior.md` | **真机实测**：按下态、页面推入/返回/对话框动效、回弹、分段 Tab、列表/卡片/分隔线/间距、品牌栏、"一个应用一个强调色" |
 | `references/inventory.md` | Figma 节点清单：节点 ID → 组件 / 变体 → CSS 类 → 截图 → 素材 |
 | `references/screenshots/NN-*.png` | 17 个 Figma 页面的截图，作为视觉对照 |
 
@@ -50,6 +53,7 @@ description: 用 Smartisan OS（锤子科技 / 坚果手机）的 UI 风格做�
    App Bar 里要放文字按钮时，用 `.s-btn.s-btn--sm`（主操作，如"完成"）或 `.s-btn--outline`；只放纯文字用 `.s-appbar__text`。列表行里要放占满剩余宽度的控件（如音量滑块），给控件加 `.s-list-item__control`。
 6. 用户要 React / Vue 组件时，按 `.s-*` 的结构和 `components.md` 的状态表来封装：pressed、disabled、selected 都要做齐。`.is-pressed` 可以用来静态展示按下态。
 7. 做完后按下方「自检清单」逐条检查；有浏览器的话截图和 `references/screenshots/` 对比。
+8. 交互、动效、间距和分隔线以 `references/device-behavior.md`（真机实测）为准；它和 Figma Kit 不一致的地方，以真机为准。
 
 ## 美学要点（为什么看起来像锤子）
 
@@ -60,10 +64,14 @@ description: 用 Smartisan OS（锤子科技 / 坚果手机）的 UI 风格做�
 5. **强调色少而低饱和**：蓝 `#5b87eb` 用于主按钮、选中、进度，对话框主操作用 `#5e80d0`；锤子红 `#cd3f3a` 用于品牌 App Bar（如 App Store），红色圆形图标（红勾、删除）用 `#e5645a`；暖黄 `#fcf6e6` 配棕字 `#ad8a67` 用于 Toast。
 6. **居中对称**。App Bar、对话框、底部弹窗的标题都绝对居中，左边返回、右边操作。
 7. **卡片式分组列表**：白底，圆角 10，0.8px `#e2e2e2`，极淡的大范围投影 `0 10px 16px rgba(0,0,0,.04)`；行高 60，行间 0.8px `#f2f2f2`；分组标题在卡片外上方（14px 600 `#7f7f7f`），说明文字在卡片下方居中。[R2] 真机设置页一致，卡片左右边距 12dp。
-8. **按下态是换色或下沉，不是涟漪**。主按钮按下变纯色 `#4772e6`；白按钮按下 `#f8f8f8`；旋钮按下变 `#ebebeb→#f2f2f2`；对话框按钮按下 `#dfdfdf`；列表行按下整行变蓝 `#5985eb`、文字变白。不要用 Material ripple，也不要 hover 放大。
+8. **按下态是换色或下沉，不是涟漪，而且是瞬时的**（[R2] 60fps 录屏：按下那一帧就变，松开那一帧就恢复，没有淡入淡出）。主按钮按下变纯色 `#4772e6`；灰色凸起按钮按下**渐变上下反转**（顶部变暗，像被按进去）；旋钮按下变 `#ebebeb→#f2f2f2`；对话框按钮按下 `#dfdfdf`；列表行按下整行变蓝 `#5985eb`、文字图标和 `>` 全变白；顶栏图标按钮只把图标变深（`#929292 → ≈#5f5f5f`），没有背景高亮。不要用 Material ripple，也不要 hover 放大。
 9. **禁用**：主按钮整体 `opacity: .3`；列表和文字用 `#bababa`，图标用 `#c6c6c6→#c8c8c8`。
-10. **页面层次**：页面底 `#f5f5f5`（[R2] 真机是 `#f0f0f0` 加 3.6px 宽、`#eeeeee` 的竖条纹）；内容块白色；底部弹窗正文区更深（`#efefef`），和白色按钮形成层次；App Bar 下方 [R2] 有一道约 8px 的渐隐阴影（`.s-appbar--shadow`）。
+10. **页面层次**：页面底 `#f5f5f5`（[R2] 真机设置页是 `#f4f4f4` / `#f2f2f2` 交替、周期约 3.6dp 的竖条纹）；内容块白色；底部弹窗正文区更深（`#efefef`），和白色按钮形成层次；App Bar 下方 [R2] **没有细线**，是一道约 13dp、从 `#dfdfdf` 渐隐的阴影（`.s-appbar--shadow`）。
 11. **字体**：[R2] 系统字体是 **Smartisan Compact**（拉丁字符）+ **Noto Sans CJK SC**（中文）；Figma Kit 用 Inter 替代。字体栈已经按这个顺序写好。
+12. **Tab 是分段控件**（[R2] 应用商店排行）：整宽、圆角 6 的浅色框，**选中段是内凹的灰色**、白字。不是 Material 的下划线 Tab。
+13. **一个应用一个强调色**：应用商店红、游戏中心紫、便签棕、系统应用蓝。品牌栏、底栏选中、Tab/勾选/主按钮/开关圆点/滑块/链接/按下的行都用同一个颜色，不要蓝色和品牌色混用。底部导航选中项在真机上是**品牌色**（Figma Kit 是加大的灰色图标）。
+14. **动效**：页面横向推入约 300ms，新页先以空白滑入、内容在后段淡入，旧页左移约 1/3；对话框从 0.85 缩放淡入约 250ms；列表到头是**弹性回弹**，没有光晕或拉伸。
+15. **间距与分隔线**：卡片左右 12dp、卡片之间约 14dp；卡片里的分隔线贯穿全宽且很浅（`#f3f3f3`），最后一行下面没有线；通栏图文列表的分隔线左右各缩进 12dp；分区之间是约 6dp 的内凹灰带，不和分隔线叠用。
 
 ## 核心 token 速查
 
@@ -71,7 +79,7 @@ description: 用 Smartisan OS（锤子科技 / 坚果手机）的 UI 风格做�
 页面底        #f5f5f5（[R2] #f0f0f0 + 竖条纹）  分隔线 #f2f2f2   描边 #e2e2e2 / #eeeeee
 正文          #333333   标题/按钮字 #636363   副标题 #7f7f7f / #9d9d9d   禁用 #bababa
 主蓝渐变      #5b87eb→#5883eb  描边 #3f68e2   按下 #4772e6 / 描边 #2f54d7   文字按钮 #5079d9
-对话框主操作  #5e80d0   对话框按钮底 #f7f7f7（按下 #dfdfdf）   遮罩 rgba(0,0,0,.6)
+对话框主操作  #5e80d0   对话框按钮底 #f7f7f7（按下 #dfdfdf）   遮罩 rgba(0,0,0,.6)（[R2] 实测约 .45）
 锤子红        App Bar #cd3f3a→#c83530 底边 #b7241f；红色图标 #e5645a→#e55f55 描边 #da463e
 图标灰        #8c8c8c→#989898（纯色 #929292）；禁用 #c6c6c6→#c8c8c8；> 箭头 #b2b2b2
 圆角          3 分段 / 4 小按钮 / 6 菜单·Tab·Toast·输入框 / 8 弹窗按钮 / 10 大按钮·卡片 / 12 对话框 / 20 底部弹窗顶 / 100 胶囊
@@ -127,6 +135,9 @@ description: 用 Smartisan OS（锤子科技 / 坚果手机）的 UI 风格做�
 - 不要用 Material 的 ripple、FAB、浮动标签输入框、底部 Snackbar。
 - 开关不要做成 iOS 那种绿色胶囊。锤子的开关是白色凹槽里一颗白色拨钮，另一侧露出一个小圆点作指示：开时拨钮在右、左侧露蓝点；关时拨钮在左、右侧露灰点。
 - 主色不要泛滥，一屏通常只有一个蓝色主按钮或一个选中态。
+- 不要保留 Material 的标志性元素：线框图标（`Icons.*_outlined`）、下划线 Tab、浮起叠放的卡片、缩放转场、圆形 Radio、按下的淡入高亮。留一个就会有"混搭"感。
+- 不要在同一个应用里混用锤子蓝和品牌色作为强调色。
+- 不要照抄应用商店顶栏下的"射灯"光斑：那是商店专属的设计，不是通用规范。
 
 ## 自检清单
 
@@ -135,7 +146,10 @@ description: 用 Smartisan OS（锤子科技 / 坚果手机）的 UI 风格做�
 - [ ] 主按钮、开关、滑块、Tab 选中、旋钮都有渐变或内凹，不是纯平色块
 - [ ] 所有可点元素都有按下态（换色 / 下沉），禁用态正确
 - [ ] 标题居中；列表行高 60；对话框宽 368、按钮高 54、主操作在最右
-- [ ] 图标是灰色细线风格（2px 圆头），尺寸是 16 / 20 / 24
+- [ ] 图标：Kit 里的图标是灰色细线风格（2px 圆头）；[R2] 系统应用的列表图标是**浅灰实心字形**，`>`、`✓`、`×`、搜索是线条；尺寸 16 / 20 / 24
+- [ ] Tab 是分段控件；按下态瞬时；页面横向推入；列表到头回弹
+- [ ] 强调色只有一个，品牌栏、底栏选中、勾选、开关、按钮、链接都是它
+- [ ] 分隔线：卡片里贯穿全宽、图文列表左右缩进 12dp、末行无线、不与分区带叠用
 - [ ] 和 `references/screenshots/` 里对应页面对比过
 
 ## 适配说明

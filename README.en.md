@@ -48,9 +48,10 @@ Just ask, e.g. "build a settings page in the Smartisan phone style" or "restyle 
 
 - **The complete UI kit**: all 17 pages with every component, variant and state. Values are read from the Figma file and cross-checked on a real Smartisan R2.
 - **Web**: `smartisan.css` (design tokens and 26 `.s-*` components), an optional `smartisan.js`, a Tailwind preset and `tokens.json`.
-- **Flutter**: design tokens, 23 vector icons and a full widget set, with no third-party packages.
+- **Flutter**: design tokens, light/dark palettes with a selectable accent colour, a complete `ThemeData`, 23 vector icons plus a 166-glyph icon font, and a full widget set (segmented tabs, brand bar, list rows with the real pressed state, bounce scrolling), with no third-party packages.
 - **Icons**: 29 SVGs, plus the tinted variants used inside components.
 - **References**: component specs, a Figma node inventory, reference screenshots of all 17 pages, and `demo.html`, a full replica of the kit.
+- **Measured on a real device**: pressed states, page/dialog motion, bounce, segmented tabs, spacing and divider rules, sampled pixel by pixel and from 60fps recordings on a Smartisan R2 (`references/device-behavior.md`).
 
 ## Showcase
 
@@ -81,4 +82,5 @@ Tested with [opencode](https://opencode.ai) + GLM-5.3.
 
 - Design source: [Smartisan OS UI Kit (Unofficial)](https://www.figma.com/community/file/1419385240874679870) by [Paix Chan](https://www.figma.com/@paixchan), licensed [CC BY 4.0](https://creativecommons.org/licenses/by/4.0/). Icons, component renders and reference screenshots come from that file and stay under CC BY 4.0.
 - Code and docs written for this repo are [MIT](LICENSE).
+- The Flutter icon font uses glyphs from [Phosphor Icons](https://phosphoricons.com) (MIT, see `assets/flutter/glyphs/svg/LICENSE`); the "more" `•••` glyph is drawn for this project.
 - Smartisan, 锤子 and the T logo are trademarks of their owners. This is an unofficial fan project, not affiliated with Smartisan. The Smartisan Compact font is not included.
