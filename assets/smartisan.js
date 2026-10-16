@@ -132,7 +132,16 @@
     var el = e.target.closest && e.target.closest('.s-switch');
     if (el && el._skipClick) { el._skipClick = false; e.preventDefault(); }
   }, true);
-  document.addEventListener('change', function (e) { if (e.target.matches && e.target.matches('.s-switch')) tick(); });
+  document.addEventListener('change', function (e) {
+    if (!e.target.matches) return;
+    if (e.target.matches('.s-switch')) tick();
+    if (e.target.matches('.s-check')) syncCheckRow(e.target);
+  });
+  // edit mode: a row holding an .s-check is tinted while it is checked
+  function syncCheckRow(c) {
+    var row = c.closest('.s-list-item'); if (!row) return;
+    row.classList.toggle('is-selected', c.checked);
+  }
 
   /* ---------- swipe-right rows ---------- */
   var openRow = null, swipe = null, swallow = false;   // swallow: eat the click of the current gesture
@@ -412,6 +421,7 @@
   function init(scope) {
     scope = scope || document;
     scope.querySelectorAll('.s-slider').forEach(syncSlider);
+    scope.querySelectorAll('.s-list-item .s-check').forEach(syncCheckRow);
     scope.querySelectorAll('.s-picker__col[data-s-wheel]').forEach(initWheel);
     scope.querySelectorAll('.s-elastic').forEach(initElastic);
     scope.querySelectorAll('.s-quickbar').forEach(initQuickbar);

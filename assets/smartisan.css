@@ -423,6 +423,7 @@ a.s-list-item, button.s-list-item, .s-list-item[data-pressable] { cursor: pointe
   box-shadow: inset 0 calc(-1 * var(--s-hair)) 0 var(--s-divider-color), -2px 0 4px rgba(0, 0, 0, 0.06);
 }
 .s-swipe[data-s-swipe].is-dragging > .s-list-item { transition: none; }
+.s-list > .s-swipe[data-s-swipe]:last-child > .s-list-item { box-shadow: -2px 0 4px rgba(0, 0, 0, 0.06); }   /* no rule under the last row */
 .s-swipe.is-removing { overflow: hidden; transition: height 200ms var(--s-ease-decel), opacity 200ms; height: 0 !important; opacity: 0; }
 
 /* ======================= Switch (42:1333) — <input type=checkbox> ======================= */
