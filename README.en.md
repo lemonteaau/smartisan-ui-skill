@@ -4,6 +4,8 @@
 
 An Agent Skill that lets coding agents build UI in the style of **Smartisan OS** (the Smartisan / Nut phone OS). Works for web and Flutter.
 
+**[Live demo](https://lemonteaau.github.io/smartisan-ui-skill/)**: the full UI kit replica; the Interaction board at the bottom is live (press states, draggable switch, swipe-to-delete, wheel picker, push transitions, Clock-style part choreography).
+
 ![smartisan-ui](docs/cover.png)
 
 ## Install
