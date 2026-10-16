@@ -441,9 +441,14 @@
       </nav>
     </div>
     <div class="stack" style="max-width:520px;font-size:14px;line-height:1.7;color:#636363">
-      <p style="margin:0">这块板子需要 <code>smartisan.js</code>。点"联系人"看页面横推和标题栏的分阶段转场（标题交叉淡入淡出、返回箭头延迟 100ms 从右侧滑入）；联系人页右侧是字母索引栏，列表到头有橡皮筋回弹（触屏）。</p>
-      <p style="margin:0">右边的时钟演示"组件编排"（锤子时钟 7.1.1 切页，R2 录屏）：表盘始终在原位，切页时指针顺着原方向转走并淡出（300ms），再从当前时间之前追上来，时针、分针、秒针各用 0.7 / 0.9 / 1.0s；闹钟的铃耳从斜后方滑回；秒表的旋钮和按键依次弹出，带一点过冲。</p>
-      <p style="margin:0">开关可以点也可以拖；闹钟行向右滑出删除按钮；"闹钟时间"打开真正能滚的滚轮；顶栏图标按住会弹性放大到 1.33 倍。</p>
+      <p style="margin:0;font-weight:700;color:#333">试试看</p>
+      <ul style="margin:0;padding-left:18px">
+        <li>按住顶栏的图标</li>
+        <li>点"联系人"进去再返回；右侧字母条可以按住滑动</li>
+        <li>拖动开关；把闹钟行向右滑</li>
+        <li>打开"闹钟时间"滚动滚轮</li>
+        <li>在旁边的时钟里切换"世界时钟 / 闹钟 / 秒表"</li>
+      </ul>
       <div class="row"><input type="checkbox" class="s-check" checked aria-label="选中"><input type="checkbox" class="s-check" aria-label="未选"><input type="checkbox" class="s-check s-check--red" checked aria-label="删除选中"><button class="s-round-add" aria-label="添加"></button><button class="s-round-remove" aria-label="移除"></button></div>
       <div class="s-list" style="width:100%"><div class="s-list-item is-selected"><input type="checkbox" class="s-check" checked aria-label="选中"><div class="s-list-item__text"><span class="s-list-item__title">多选时的选中行</span></div></div><div class="s-list-item"><input type="checkbox" class="s-check" aria-label="未选"><div class="s-list-item__text"><span class="s-list-item__title">未选中行</span></div></div></div>
     </div>
