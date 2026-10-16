@@ -223,7 +223,7 @@
 /* zero specificity on purpose: any class you put on an app-bar button overrides this reset */
 :where(.s-appbar > button, .s-appbar__actions > button):where(:not(.s-btn, .s-btn-icon)) {
   all: unset; cursor: pointer; display: inline-flex; align-items: center; justify-content: center; color: var(--s-icon);
-  transition: transform 260ms var(--s-ease-spring);
+  transition: transform 220ms var(--s-ease-spring);   /* R2: peak ≈1.39 at ~120ms, settles at 1.33 by ~220ms */
 }
 /* Bar icons (TitleBar setBarIconScaleTouchListener): the glyph darkens and pops to 1.33x on a spring
    while held, then springs back. No background highlight. */
@@ -440,7 +440,7 @@ a.s-list-item, button.s-list-item, .s-list-item[data-pressable] { cursor: pointe
   content: ""; position: absolute; top: -0.4px; left: -0.4px; width: 24px; height: 24px; border-radius: 50%; z-index: 1;
   background: var(--s-grad-white); border: var(--s-hair-xs) solid var(--s-grey-400); box-shadow: var(--s-shadow-thumb);
   left: calc(-0.4px + var(--pos, 0) * (100% - 23.2px));
-  transition: left calc(84ms * var(--travel, 1)) linear;   /* SwitchEx: 350dp/s, linear */
+  transition: left calc(70ms * var(--travel, 1)) linear;   /* SwitchEx, linear; R2 recording: full travel in ~4 frames */
 }
 .s-switch:checked { --pos: 1; }
 .s-switch.is-dragging::before { transition: none; }   /* smartisan.js sets --pos while the thumb is dragged */
@@ -469,12 +469,13 @@ a.s-list-item, button.s-list-item, .s-list-item[data-pressable] { cursor: pointe
 .s-overlay--inline { position: relative; inset: auto; z-index: auto; }
 .s-overlay--in-frame { position: absolute; }   /* inside a position:relative phone frame instead of the viewport */
 .s-overlay[hidden] { display: none; }   /* .s-overlay sets display:flex, which would beat the UA [hidden] rule */
-/* Dialog in: scrim fades, card scales 0.85 → 1 and fades (≈250ms, decelerate; R2 recording). Out is quicker and
-   accelerates (150ms). smartisan.js adds .is-closing before setting [hidden]. */
-.s-overlay:not([hidden]) { animation: s-fade-in 250ms var(--s-ease-decel); }
-.s-overlay:not([hidden]) > .s-dialog { animation: s-dialog-in 250ms var(--s-ease-decel); }
-.s-overlay.is-closing { animation: s-fade-out 150ms var(--s-ease-accel) forwards; }
-.s-overlay.is-closing > .s-dialog { animation: s-dialog-out 150ms var(--s-ease-accel) forwards; }
+/* Dialog (R2 recordings, 60fps): the scrim darkens to 60% over ~200ms while the card pops in fast —
+   scale ≈0.88 → 1 with a fade in ~120ms, decelerating. Closing: the card fades in ~100ms, the scrim
+   clears over ~200ms. smartisan.js adds .is-closing before setting [hidden]. */
+.s-overlay:not([hidden]) { animation: s-fade-in 200ms var(--s-ease-decel); }
+.s-overlay:not([hidden]) > .s-dialog { animation: s-dialog-in 120ms var(--s-ease-decel); }
+.s-overlay.is-closing { animation: s-scrim-out 200ms var(--s-ease-decel) forwards; }
+.s-overlay.is-closing > .s-dialog { animation: s-fade-out 100ms var(--s-ease-accel) forwards; }
 /* Bottom menu (MenuDialog / bottom sheet): slides up 300ms decelerate, leaves 250ms accelerate */
 .s-overlay--sheet { align-items: flex-end; padding: 0; }
 .s-overlay--sheet:not([hidden]) > .s-sheet { animation: s-sheet-in 300ms var(--s-ease-decel); }
@@ -482,7 +483,8 @@ a.s-list-item, button.s-list-item, .s-list-item[data-pressable] { cursor: pointe
 .s-overlay--sheet.is-closing > .s-sheet { animation: s-sheet-out 250ms var(--s-ease-accel) forwards; }
 @keyframes s-fade-in { from { opacity: 0; } to { opacity: 1; } }
 @keyframes s-fade-out { from { opacity: 1; } to { opacity: 0; } }
-@keyframes s-dialog-in { from { opacity: 0; transform: scale(0.85); } to { opacity: 1; transform: none; } }
+@keyframes s-dialog-in { from { opacity: 0; transform: scale(0.88); } to { opacity: 1; transform: none; } }
+@keyframes s-scrim-out { from { opacity: 1; } to { opacity: 0; } }
 @keyframes s-dialog-out { from { opacity: 1; transform: none; } to { opacity: 0; transform: scale(0.9); } }
 @keyframes s-sheet-in { from { transform: translateY(100%); } to { transform: none; } }
 @keyframes s-sheet-out { from { transform: none; } to { transform: translateY(100%); } }
@@ -765,4 +767,33 @@ a.s-list-item, button.s-list-item, .s-list-item[data-pressable] { cursor: pointe
 
 @media (prefers-reduced-motion: reduce) {
   .s-overlay, .s-overlay > *, .s-stack__page, .s-stack__page > *, .s-modal-page, .s-appbar * { animation-duration: 1ms !important; animation-delay: 0ms !important; }
+}
+
+/* ==========================================================================
+   Part choreography (Clock 7.1.1 tab switch, R2 recording). When pages share a main visual
+   (a dial, a gauge, a card), that visual stays put and only its parts move:
+     out  ≈300ms, accelerating — parts keep going the way they were going (hands spin on) and fade;
+     in   staggered, each part on its own clock — hands chase in from behind (0.7 / 0.9 / 1.0s),
+          ears slide back from a diagonal offset (700ms), buttons pop with a little overshoot.
+   Markup: .s-swap holds the persistent anchor plus .s-swap__panel layers; give moving parts
+   data-s-part and set --from-* / --to-* / --d / --delay on them. smartisan.js runs it.
+   ========================================================================== */
+.s-swap { position: relative; }
+.s-swap__panel[hidden] { display: none; }
+.s-swap__panel.is-leaving [data-s-part], .s-swap__panel.is-leaving > :not([data-s-part]) {
+  animation: s-part-out var(--d-out, 300ms) var(--s-ease-accel) both;
+}
+.s-swap__panel.is-entering [data-s-part] {
+  animation: s-part-in var(--d, 700ms) var(--ease, var(--s-ease-decel)) var(--delay, 0ms) both;
+}
+.s-swap__panel.is-entering > :not([data-s-part]) { animation: s-fade-in 300ms var(--s-ease-decel) 150ms both; }
+[data-s-part="pop"] { --ease: var(--s-ease-spring); --from-s: 0.6; }
+@keyframes s-part-in {
+  from { opacity: 0; translate: var(--from-x, 0) var(--from-y, 0); rotate: var(--from-r, 0deg); scale: var(--from-s, 1); }
+}
+@keyframes s-part-out {
+  to { opacity: 0; translate: var(--to-x, 0) var(--to-y, 0); rotate: var(--to-r, 0deg); scale: var(--to-s, 1); }
+}
+@media (prefers-reduced-motion: reduce) {
+  .s-swap__panel [data-s-part], .s-swap__panel > * { animation-duration: 1ms !important; animation-delay: 0ms !important; }
 }

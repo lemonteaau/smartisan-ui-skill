@@ -6,7 +6,7 @@
 
    Pressed state     buttons stay visibly pressed >= 64ms after a quick tap; list rows press after a
                      100ms tap timeout and cancel when the finger starts scrolling (no blue flashes)
-   .s-switch         tap toggles; the thumb can also be dragged (350dp/s linear settle)
+   .s-switch         tap toggles; the thumb can also be dragged (linear ~70ms settle)
    [data-s-open=id]  opens a .s-overlay or .s-modal-page; [data-s-close] closes the one it is in;
                      scrim tap / Esc close overlays unless data-s-modal is set
    .s-stack          [data-s-push=pageId] pushes, [data-s-back] pops; with data-s-appbar="barId"
@@ -16,8 +16,10 @@
    .s-elastic        rubber-band overscroll on touch (needs a .s-elastic__content child)
    .s-quickbar       A–Z# index strip; fires "s-letter" with the letter in event.detail
    .s-slider         keeps --p (filled track) in sync with the value
+   .s-swap           part choreography: [data-s-show=panelId] swaps .s-swap__panel layers — the old
+                     panel's parts leave (300ms), then the new panel's [data-s-part]s enter on their own clocks
 
-   API: Smartisan.open(el|id) / close / push(stack, page) / pop(stack) / toast(text, ms) / init(scope)
+   API: Smartisan.open(el|id) / close / push(stack, page) / pop(stack) / show(panel) / toast(text, ms) / init(scope)
         Smartisan.haptics = true  → short navigator.vibrate() ticks on wheel steps, switch, quick bar
 */
 (function () {
@@ -85,7 +87,7 @@
   function close(el) {
     el = $(el); if (!el || el.hidden || el.classList.contains('is-closing')) return;
     el.classList.add('is-closing');
-    after(el, el.classList.contains('s-modal-page') || el.classList.contains('s-overlay--sheet') ? 300 : 150, function () {
+    after(el, el.classList.contains('s-modal-page') || el.classList.contains('s-overlay--sheet') ? 300 : 200, function () {
       el.hidden = true; el.classList.remove('is-closing'); emit(el, 's-close');
     });
   }
@@ -351,6 +353,37 @@
     bar.addEventListener('pointerup', up); bar.addEventListener('pointercancel', up);
   }
 
+  /* ---------- part choreography (Clock tab switch) ---------- */
+  function longest(panel) {
+    var max = 0;
+    panel.querySelectorAll('[data-s-part]').forEach(function (p) {
+      var cs = getComputedStyle(p);
+      var d = parseFloat(cs.getPropertyValue('--d')) || 700, de = parseFloat(cs.getPropertyValue('--delay')) || 0;
+      max = Math.max(max, d + de);
+    });
+    return Math.max(max, 450);
+  }
+  function show(panel) {
+    panel = $(panel); if (!panel) return;
+    var box = panel.closest('.s-swap'); if (!box || box._busy) return;
+    var panels = Array.prototype.filter.call(box.children, function (c) { return c.classList.contains('s-swap__panel'); });
+    var cur = panels.filter(function (p) { return !p.hidden; })[0];
+    if (cur === panel) return;
+    box._busy = true;
+    document.querySelectorAll('[data-s-show]').forEach(function (b) {
+      if (panels.indexOf($(b.getAttribute('data-s-show'))) < 0) return;
+      if (b.getAttribute('data-s-show') === panel.id) b.setAttribute('aria-current', 'page'); else b.removeAttribute('aria-current');
+    });
+    var enter = function () {
+      if (cur) { cur.hidden = true; cur.classList.remove('is-leaving'); }
+      panel.hidden = false; panel.classList.add('is-entering'); box._busy = false;
+      var ms = longest(panel);
+      clearTimeout(panel._t); panel._t = setTimeout(function () { panel.classList.remove('is-entering'); }, ms + 50);
+      emit(panel, 's-show');
+    };
+    if (cur) { cur.classList.add('is-leaving'); setTimeout(enter, 300); } else enter();
+  }
+
   /* ---------- wiring ---------- */
   function syncSlider(el) {
     var min = +el.min || 0, max = el.max === '' ? 100 : +el.max, v = +el.value;
@@ -358,6 +391,8 @@
   }
   document.addEventListener('input', function (e) { if (e.target.classList && e.target.classList.contains('s-slider')) syncSlider(e.target); });
   document.addEventListener('click', function (e) {
+    var sh = e.target.closest('[data-s-show]');
+    if (sh) { show(sh.getAttribute('data-s-show')); return; }
     var t = e.target.closest('[data-s-open], [data-s-close], [data-s-push], [data-s-back]');
     if (t && t.hasAttribute('data-s-open')) { open(t.getAttribute('data-s-open')); return; }
     if (t && t.hasAttribute('data-s-close')) { close(t.getAttribute('data-s-close') || t.closest('.s-overlay, .s-modal-page')); return; }
@@ -384,6 +419,6 @@
   if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', function () { init(); }); else init();
 
   api.open = open; api.close = close; api.toast = toast; api.push = push; api.pop = pop;
-  api.syncSlider = syncSlider; api.init = init;
+  api.syncSlider = syncSlider; api.init = init; api.show = show;
   window.Smartisan = api;
 })();

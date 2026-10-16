@@ -30,6 +30,28 @@
   .phone { position: relative; width: 432px; max-width: 100%; height: 760px; overflow: hidden; background: var(--s-page); border-radius: 24px; box-shadow: 0 0 0 1px #d0d0d0, 0 20px 40px rgba(0,0,0,.08); }
   .phone > .s-stack { position: absolute; top: 48px; left: 0; right: 0; bottom: 0; }
   .phone > .s-appbar { position: relative; z-index: 5; }
+  .clockdemo { height: 640px; display: flex; flex-direction: column; }
+  .clockdemo .cd-stage { flex: 1; background: linear-gradient(#fff, #f5f5f5); }
+  .cd-dial, .cd-face { position: absolute; left: 50%; top: 60px; width: 260px; height: 260px; margin-left: -130px; border-radius: 50%; z-index: 1;
+    background: radial-gradient(circle at 50% 35%, #5d5d5d, #3f3f3f 70%); box-shadow: 0 0 0 13px #fff, 0 0 0 14px #e6e6e6, 0 14px 24px rgba(0,0,0,.18); }
+  .cd-face { z-index: 2; background: radial-gradient(circle at 50% 40%, #fff, #ececec); box-shadow: 0 0 0 13px #fff, 0 0 0 14px #e2e2e2, inset 0 2px 6px rgba(0,0,0,.08), 0 14px 24px rgba(0,0,0,.12); }
+  .cd-num { position: absolute; color: rgba(255,255,255,.85); font: 600 20px var(--s-font); }
+  .cd-12 { left: 50%; top: 14px; transform: translateX(-50%); } .cd-3 { right: 18px; top: 50%; transform: translateY(-50%); }
+  .cd-cap { position: absolute; left: 50%; top: 50%; width: 14px; height: 14px; margin: -7px 0 0 -7px; border-radius: 50%; background: #d23b33; box-shadow: 0 0 0 4px #fff; z-index: 5; }
+  .cd-hand { position: absolute; left: 50%; top: 190px; z-index: 4; transform-origin: 50% 100%; transform: rotate(var(--a)); border-radius: 4px; }
+  .cd-h { width: 12px; height: 70px; margin: -70px 0 0 -6px; background: #f2f2f2; box-shadow: 0 2px 4px rgba(0,0,0,.3); }
+  .cd-m { width: 10px; height: 100px; margin: -100px 0 0 -5px; background: #fafafa; box-shadow: 0 2px 4px rgba(0,0,0,.3); }
+  .cd-s { width: 2px; height: 118px; margin: -118px 0 0 -1px; background: #d23b33; }
+  .cd-s--watch { z-index: 6; height: 110px; margin-top: -110px; }
+  .cd-ear { position: absolute; top: 46px; width: 70px; height: 44px; border-radius: 40px 40px 8px 8px; background: linear-gradient(#fff, #e9e9e9); box-shadow: 0 2px 4px rgba(0,0,0,.12); z-index: 0; }
+  .cd-ear--l { left: 64px; transform: rotate(-28deg); } .cd-ear--r { right: 64px; transform: rotate(28deg); }
+  .cd-crown { position: absolute; left: 50%; top: 28px; width: 34px; height: 30px; margin-left: -17px; border-radius: 8px 8px 4px 4px; background: linear-gradient(#fff, #e6e6e6); box-shadow: 0 2px 4px rgba(0,0,0,.15); z-index: 0; }
+  .cd-key { position: absolute; top: 60px; width: 24px; height: 38px; border-radius: 6px; background: linear-gradient(#fff, #e6e6e6); box-shadow: 0 2px 4px rgba(0,0,0,.15); z-index: 0; }
+  .cd-key--l { left: 74px; transform: rotate(-45deg); } .cd-key--r { right: 74px; transform: rotate(45deg); }
+  .cd-label { position: absolute; left: 0; right: 0; top: 360px; display: flex; flex-direction: column; align-items: center; gap: 6px; color: #333; }
+  .cd-label b { font-size: 18px; } .cd-label small { font-size: 12px; color: #9d9d9d; } .cd-red { color: #d23b33; font-size: 28px !important; font-weight: 400; }
+  .cd-nav { border-top: 1px solid #e2e2e2; }
+  .cd-nav > button { width: auto; min-width: 48px; font-size: 10px; }
   @media (max-width: 720px) { .chip-grid { grid-template-columns: repeat(4, auto); } .icon-grid { grid-template-columns: repeat(4, 64px); } .s-kit-body { padding: 32px 16px; } }
 </style>
 </head>
@@ -801,8 +823,42 @@
       <div class="s-toast-host s-toast-host--in-frame" hidden></div>
     </div>
 
+
+    <div class="phone clockdemo">
+      <header class="s-appbar s-appbar--shadow"><span class="s-appbar__spacer"></span><span class="s-appbar__title" id="cd-title">世界时钟</span></header>
+      <div class="s-swap cd-stage">
+        <div class="cd-dial" aria-hidden="true"><span class="cd-num cd-12">12</span><span class="cd-num cd-3">3</span><i class="cd-cap"></i></div>
+        <div class="s-swap__panel" id="cd-world">
+          <i data-s-part class="cd-hand cd-h" style="--a:0deg;--from-r:-60deg;--to-r:30deg;--d:700ms"></i>
+          <i data-s-part class="cd-hand cd-m" style="--a:0deg;--from-r:-90deg;--to-r:60deg;--d:900ms"></i>
+          <i data-s-part class="cd-hand cd-s" style="--a:0deg;--from-r:-120deg;--to-r:90deg;--d:1000ms"></i>
+          <div class="cd-label"><b>本地时间</b><small id="cd-date"></small></div>
+        </div>
+        <div class="s-swap__panel" id="cd-alarm" hidden>
+          <i data-s-part class="cd-ear cd-ear--l" style="--from-x:24px;--from-y:24px;--d:700ms"></i>
+          <i data-s-part class="cd-ear cd-ear--r" style="--from-x:-24px;--from-y:24px;--d:700ms"></i>
+          <i data-s-part class="cd-hand cd-h" style="--a:225deg;--from-r:-60deg;--to-r:30deg;--d:700ms"></i>
+          <i data-s-part class="cd-hand cd-m" style="--a:180deg;--from-r:-90deg;--to-r:60deg;--d:900ms"></i>
+          <div class="cd-label"><b>07:30</b><small>工作日 · 下一个闹钟</small></div>
+        </div>
+        <div class="s-swap__panel" id="cd-watch" hidden>
+          <i data-s-part="pop" class="cd-face" style="--d:300ms;--from-s:0.96"></i>
+          <i data-s-part="pop" class="cd-crown" style="--from-y:14px;--d:400ms;--delay:130ms"></i>
+          <i data-s-part="pop" class="cd-key cd-key--l" style="--from-x:10px;--from-y:10px;--d:430ms;--delay:250ms"></i>
+          <i data-s-part="pop" class="cd-key cd-key--r" style="--from-x:-10px;--from-y:10px;--d:450ms;--delay:250ms"></i>
+          <i data-s-part class="cd-hand cd-s cd-s--watch" style="--a:0deg;--from-r:-30deg;--to-r:90deg;--d:400ms"></i>
+          <div class="cd-label"><b class="cd-red">00:00.00</b><small>点击开始计时</small></div>
+        </div>
+      </div>
+      <nav class="s-bottom-nav cd-nav">
+        <button data-s-show="cd-world" aria-current="page"><svg class="s-icon"><use href="#si-setting"/></svg>世界时钟</button>
+        <button data-s-show="cd-alarm"><svg class="s-icon"><use href="#si-star"/></svg>闹钟</button>
+        <button data-s-show="cd-watch"><svg class="s-icon"><use href="#si-playing"/></svg>秒表</button>
+      </nav>
+    </div>
     <div class="stack" style="max-width:520px;font-size:14px;line-height:1.7;color:#636363">
       <p style="margin:0">这块板子需要 <code>smartisan.js</code>。点"联系人"看页面横推和标题栏的分阶段转场（标题交叉淡入淡出、返回箭头延迟 100ms 从右侧滑入）；联系人页右侧是字母索引栏，列表到头有橡皮筋回弹（触屏）。</p>
+      <p style="margin:0">右边的时钟演示"组件编排"（锤子时钟 7.1.1 切页，R2 录屏）：表盘始终在原位，切页时指针顺着原方向转走并淡出（300ms），再从当前时间之前追上来，时针、分针、秒针各用 0.7 / 0.9 / 1.0s；闹钟的铃耳从斜后方滑回；秒表的旋钮和按键依次弹出，带一点过冲。</p>
       <p style="margin:0">开关可以点也可以拖；闹钟行向右滑出删除按钮；"闹钟时间"打开真正能滚的滚轮；顶栏图标按住会弹性放大到 1.33 倍。</p>
       <div class="row"><input type="checkbox" class="s-check" checked aria-label="选中"><input type="checkbox" class="s-check" aria-label="未选"><input type="checkbox" class="s-check s-check--red" checked aria-label="删除选中"><button class="s-round-add" aria-label="添加"></button><button class="s-round-remove" aria-label="移除"></button></div>
       <div class="s-list" style="width:100%"><div class="s-list-item is-selected"><input type="checkbox" class="s-check" checked aria-label="选中"><div class="s-list-item__text"><span class="s-list-item__title">多选时的选中行</span></div></div><div class="s-list-item"><input type="checkbox" class="s-check" aria-label="未选"><div class="s-list-item__text"><span class="s-list-item__title">未选中行</span></div></div></div>
@@ -847,6 +903,14 @@
     document.getElementById('wh').innerHTML = Array.from({ length: 24 }, (_, i) => `<span${i === 7 ? ' aria-selected="true"' : ''}>${pad(i)}</span>`).join('');
     document.getElementById('wm').innerHTML = Array.from({ length: 60 }, (_, i) => `<span${i === 30 ? ' aria-selected="true"' : ''}>${pad(i)}</span>`).join('');
     Smartisan.init(document.getElementById('phone'));
+    // clock demo: world-clock hands show the current time
+    const now = new Date(), w = document.getElementById('cd-world');
+    const [h, m, sec] = w.querySelectorAll('.cd-hand');
+    h.style.setProperty('--a', ((now.getHours() % 12) * 30 + now.getMinutes() / 2) + 'deg');
+    m.style.setProperty('--a', (now.getMinutes() * 6) + 'deg');
+    sec.style.setProperty('--a', (now.getSeconds() * 6) + 'deg');
+    document.getElementById('cd-date').textContent = (now.getMonth() + 1) + '.' + now.getDate() + ' 星期' + '日一二三四五六'[now.getDay()];
+    document.addEventListener('s-show', e => { const t = { 'cd-world': '世界时钟', 'cd-alarm': '闹钟', 'cd-watch': '秒表' }[e.target.id]; if (t) document.getElementById('cd-title').textContent = t; });
     document.getElementById('time-ok').addEventListener('click', () => {
       const v = id => document.querySelector('#' + id + ' [aria-selected="true"]').textContent;
       document.getElementById('time-out').firstChild.textContent = v('wh') + ':' + v('wm');

@@ -549,3 +549,145 @@ class SRoundEditButton extends StatelessWidget {
     },
   );
 }
+
+// ============================================================================================
+// Part choreography (Clock 7.1.1 tab switch)
+// ============================================================================================
+
+/// One moving part of a persistent component. When it is first built it animates in from
+/// [fromOffset] / [fromTurns] / [fromScale] (and from transparent) after [delay], over
+/// [duration] — e.g. clock hands chasing in from behind (−1/6, −1/4, −1/3 turn over 700 / 900 /
+/// 1000ms), alarm "ears" sliding back from a diagonal (700ms), stopwatch keys popping with
+/// [Curves.easeOutBack]. Give it a new key to replay. Pair it with [SPartSwitcher].
+class SPartEntrance extends StatefulWidget {
+  const SPartEntrance({
+    super.key,
+    required this.child,
+    this.duration = const Duration(milliseconds: 700),
+    this.delay = Duration.zero,
+    this.fromOffset = Offset.zero,
+    this.fromTurns = 0,
+    this.fromScale = 1,
+    this.curve = SMotion.decelerate,
+  });
+
+  final Widget child;
+  final Duration duration, delay;
+  final Offset fromOffset;
+  final double fromTurns, fromScale;
+  final Curve curve;
+
+  @override
+  State<SPartEntrance> createState() => _SPartEntranceState();
+}
+
+class _SPartEntranceState extends State<SPartEntrance>
+    with SingleTickerProviderStateMixin {
+  late final AnimationController _c = AnimationController(
+    vsync: this,
+    duration: widget.duration,
+  );
+  Timer? _start;
+
+  @override
+  void initState() {
+    super.initState();
+    if (widget.delay == Duration.zero) {
+      _c.forward();
+    } else {
+      _start = Timer(widget.delay, () {
+        if (mounted) _c.forward();
+      });
+    }
+  }
+
+  @override
+  void dispose() {
+    _start?.cancel();
+    _c.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) => AnimatedBuilder(
+    animation: _c,
+    child: widget.child,
+    builder: (context, child) {
+      final t = widget.curve.transform(_c.value);
+      final u = 1 - t;
+      return Opacity(
+        opacity: SMotion.decelerate.transform(_c.value.clamp(0, 1)),
+        child: Transform.translate(
+          offset: widget.fromOffset * u,
+          child: Transform.rotate(
+            angle: widget.fromTurns * u * 2 * math.pi,
+            child: Transform.scale(
+              scale: widget.fromScale + (1 - widget.fromScale) * t,
+              child: child,
+            ),
+          ),
+        ),
+      );
+    },
+  );
+}
+
+/// Swaps the moving layer of a persistent component, the Smartisan way: the old layer leaves in
+/// 300ms (accelerating fade, optionally still turning by [exitTurns] so hands "keep going"), then
+/// the new [child] is built — its [SPartEntrance]s run on their own clocks. Keep the anchor (the
+/// dial, card or gauge body) outside this widget so it never moves. Change [child]'s key to swap.
+class SPartSwitcher extends StatefulWidget {
+  const SPartSwitcher({super.key, required this.child, this.exitTurns = 0});
+  final Widget child;
+  final double exitTurns;
+
+  @override
+  State<SPartSwitcher> createState() => _SPartSwitcherState();
+}
+
+class _SPartSwitcherState extends State<SPartSwitcher>
+    with SingleTickerProviderStateMixin {
+  late Widget _shown = widget.child;
+  late final AnimationController _out = AnimationController(
+    vsync: this,
+    duration: SMotion.base,
+  );
+
+  @override
+  void didUpdateWidget(SPartSwitcher old) {
+    super.didUpdateWidget(old);
+    if (!Widget.canUpdate(old.child, widget.child)) {
+      _out.forward(from: 0).whenComplete(() {
+        if (!mounted) return;
+        setState(() => _shown = widget.child);
+        _out.value = 0;
+      });
+    } else if (!_out.isAnimating) {
+      _shown = widget.child;
+    }
+  }
+
+  @override
+  void dispose() {
+    _out.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) => AnimatedBuilder(
+    animation: _out,
+    child: _shown,
+    builder: (context, child) {
+      final t = SMotion.accelerate.transform(_out.value);
+      return Opacity(
+        opacity: 1 - t,
+        child: widget.exitTurns == 0
+            ? child
+            : Transform.rotate(
+                angle: widget.exitTurns * t * 2 * math.pi,
+                child: child,
+              ),
+      );
+    },
+  );
+}

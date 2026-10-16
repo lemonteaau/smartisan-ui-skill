@@ -140,7 +140,7 @@
   <div class="s-dialog__actions"><button>取消</button><button data-primary>确定</button></div>
 </div></div>
 ```
-- 用 `hidden` 属性控制显示和隐藏（`.s-overlay[hidden]` 已经处理）。出现时遮罩淡入、卡片从 0.85 缩放淡入（250ms decelerate）；用 `smartisan.js` 关闭时 150ms 加速退出。`data-s-open` / `data-s-close` 开关，点遮罩或按 Esc 关闭（加 `data-s-modal` 可禁止）。
+- 用 `hidden` 属性控制显示和隐藏（`.s-overlay[hidden]` 已经处理）。出现时遮罩 200ms 加深到 60%，卡片约 120ms 从 0.88 弹到原大并淡入；用 `smartisan.js` 关闭时卡片 100ms 淡出、遮罩 200ms 褪去（[R2] 录屏）。`data-s-open` / `data-s-close` 开关，点遮罩或按 Esc 关闭（加 `data-s-modal` 可禁止）。
 - 遮罩 `rgba(0,0,0,.6)`；对话框宽 368（在 432 宽屏幕上左右各留 32）。
 - **Dialog Header**（`171:272`）：高 48，底 `#fafafa`，底线 1px `#ededed`，上圆角 12，18px 700 `#636363` 居中。
 - **Content**：白底，内边距 20，16px / 行高 24 `#656565`。
@@ -220,7 +220,7 @@
   - selected=true：旋钮在右，左侧露出蓝点 `#9cbcff→#7da7ff`（描边 `#769dfe`）。
   - selected=false：旋钮在左，右侧露出灰点 `#f4f4f4`（描边 `#e8e8e8`）。
 - 原始矢量：`assets/kit-renders/switch-*.svg`。
-- 手感（SwitchEx，需 `smartisan.js`）：点一下切换；也可以拖拇指，移动超过 8dp 或按住超过 300ms 时按拇指位置决定。归位是 350dp/s 的**线性**移动（满程约 84ms），按下时拨钮变按下渐变。禁用 75% 不透明度。
+- 手感（SwitchEx，需 `smartisan.js`）：点一下切换；也可以拖拇指，移动超过 8dp 或按住超过 300ms 时按拇指位置决定。归位是**线性**移动（满程约 70ms，[R2] 录屏），按下时拨钮变按下渐变。禁用 75% 不透明度。
 
 ## 12. Popup Menu · `.s-menu`（`253:2463`），Item（`175:1583`）
 - 宽 220，圆角 6，0.4px `#e2e2e2`，overflow hidden。
@@ -318,4 +318,24 @@
 22 圆，绿 `#a5d65c→#8fc445` 白 +，红 `#ec6a60→#e3564c` 白 −；用在编辑列表的行首。
 
 ### 标题栏图标
-`.s-appbar` 里的图标按钮按住时图标变深并弹性放大到 1.33 倍（spring 曲线 260ms），松手弹回；红色栏里图标变成 70% 白。纯 CSS，不需要 JS。
+`.s-appbar` 里的图标按钮按住时图标变深并弹性放大到 1.33 倍（spring 曲线 220ms，会先冲到约 1.39 再落回），松手弹回；红色栏里图标变成 70% 白。纯 CSS，不需要 JS。
+
+### 组件编排 · `.s-swap`
+```html
+<div class="s-swap">
+  <div class="dial">…不动的主体…</div>
+  <div class="s-swap__panel" id="world">
+    <i data-s-part class="hand" style="--from-r:-60deg; --to-r:30deg; --d:700ms"></i>
+    <div class="label">本地时间</div>
+  </div>
+  <div class="s-swap__panel" id="alarm" hidden>
+    <i data-s-part class="ear" style="--from-x:24px; --from-y:24px; --d:700ms"></i>
+    <i data-s-part="pop" class="key" style="--from-y:14px; --d:400ms; --delay:130ms"></i>
+  </div>
+</div>
+<button data-s-show="alarm">闹钟</button>
+```
+- 切换时旧面板的部件 300ms 加速离场（`--to-x/-y/-r/-s` 是离场时的去向，不写就只淡出），面板里没标 `data-s-part` 的直接子元素（文字）一起淡出；新面板的部件按各自的 `--d`、`--delay` 从 `--from-*` 入场，文字延迟 150ms 淡入。
+- `data-s-part="pop"` 用过冲曲线、从 0.6 倍弹出。用的是独立的 `translate` / `rotate` / `scale` 属性，部件原本的 `transform`（比如指针角度）不受影响。
+- 被选中的 `data-s-show` 按钮会自动加 `aria-current="page"`；新面板出现时触发 `s-show` 事件。也可以调用 `Smartisan.show(panel)`。
+

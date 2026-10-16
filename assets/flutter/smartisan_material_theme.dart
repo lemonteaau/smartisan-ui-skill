@@ -582,7 +582,9 @@ abstract final class SmartisanMaterialTheme {
         backgroundColor: p.card,
         surfaceTintColor: Colors.transparent,
         elevation: 0,
-        barrierColor: const Color(0x73000000), // ≈45%, measured on the R2
+        barrierColor: const Color(
+          0x99000000,
+        ), // 60%, measured on the R2 (two dialogs)
         shape: const RoundedRectangleBorder(
           borderRadius: BorderRadius.all(Radius.circular(SRadii.dialog)),
         ),

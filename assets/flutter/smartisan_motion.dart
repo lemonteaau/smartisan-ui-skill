@@ -8,7 +8,8 @@
 //   left and dims. Pop mirrors it in ≈270ms with a decelerating curve.        → SPageRoute
 // Full-screen pages (settings, editors, "new …"): rise from the bottom in 300ms (decelerate
 //   cubic) over a page that does not move; leave downward.                    → SModalPageRoute
-// Dialogs: scrim fades, card scales 0.85 → 1 and fades (250ms decelerate); leaves in 150ms.
+// Dialogs (R2 recordings): scrim darkens to 60% over 200ms; the card pops in fast — 0.88 → 1 with a
+//   fade in ~120ms; on close the card fades in ~100ms while the scrim clears over 200ms.
 //                                                                              → SDialogRoute
 // Bottom menus: up 300ms decelerate, down 250ms accelerate (see showSBottomSheet).
 // Overscroll: elastic rubber band, no glow / stretch.                         → SmartisanScrollBehavior
@@ -28,7 +29,7 @@ abstract final class SMotion {
 
   static const fast = Duration(milliseconds: 150);
   static const swipe = Duration(milliseconds: 200);
-  static const dialogIn = Duration(milliseconds: 250);
+  static const dialog = Duration(milliseconds: 200);
   static const sheetOut = Duration(milliseconds: 250);
   static const pop = Duration(milliseconds: 270);
   static const base = Duration(milliseconds: 300);
@@ -47,7 +48,7 @@ abstract final class SMotion {
 
   /// Title-bar icons pop to this scale while held (spring, damping .55 / stiffness 800).
   static const double barIconScale = 1.33;
-  static const barIconSpring = Duration(milliseconds: 260);
+  static const barIconSpring = Duration(milliseconds: 220);
 }
 
 /// Bouncing (elastic) overscroll everywhere, no glow / stretch indicator.
@@ -83,11 +84,11 @@ class SmartisanDialogEntrance extends StatelessWidget {
   Widget build(BuildContext context) {
     return TweenAnimationBuilder<double>(
       tween: Tween(begin: 0, end: 1),
-      duration: SMotion.dialogIn,
+      duration: const Duration(milliseconds: 120),
       curve: SMotion.decelerate,
       builder: (context, t, child) => Opacity(
         opacity: t.clamp(0, 1),
-        child: Transform.scale(scale: 0.85 + 0.15 * t, child: child),
+        child: Transform.scale(scale: 0.88 + 0.12 * t, child: child),
       ),
       child: child,
     );
@@ -246,8 +247,8 @@ class SModalPageRoute<T> extends PageRoute<T> {
   );
 }
 
-/// Popup route for dialogs: scrim fades in, the card scales 0.85 → 1 and fades (250ms decelerate),
-/// and leaves faster (150ms accelerate). Used by showSDialog / showSSimpleDialog.
+/// Popup route for dialogs: the scrim fades over 200ms; the card scales 0.88 → 1 and fades in the
+/// first ~120ms, and on close fades out in the first ~100ms. Used by showSDialog / showSSimpleDialog.
 class SDialogRoute<T> extends PopupRoute<T> {
   SDialogRoute({
     required this.builder,
@@ -265,9 +266,9 @@ class SDialogRoute<T> extends PopupRoute<T> {
   @override
   String? get barrierLabel => 'dismiss';
   @override
-  Duration get transitionDuration => SMotion.dialogIn;
+  Duration get transitionDuration => SMotion.dialog;
   @override
-  Duration get reverseTransitionDuration => SMotion.fast;
+  Duration get reverseTransitionDuration => SMotion.dialog;
 
   @override
   Widget buildPage(
@@ -285,13 +286,13 @@ class SDialogRoute<T> extends PopupRoute<T> {
   ) {
     final t = CurvedAnimation(
       parent: animation,
-      curve: SMotion.decelerate,
-      reverseCurve: SMotion.accelerate,
+      curve: const Interval(0, .6, curve: SMotion.decelerate),
+      reverseCurve: const Interval(.5, 1, curve: SMotion.accelerate),
     );
     return FadeTransition(
       opacity: t,
       child: ScaleTransition(
-        scale: Tween(begin: 0.85, end: 1.0).animate(t),
+        scale: Tween(begin: 0.88, end: 1.0).animate(t),
         child: child,
       ),
     );

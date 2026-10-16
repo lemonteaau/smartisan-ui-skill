@@ -991,7 +991,7 @@ class SListTileSimple extends StatelessWidget {
 
 /// 52×24 recessed track, white thumb, indicator dot on the free side (blue when on, grey when off).
 /// Behaves like SwitchEx: tap toggles; the thumb can be dragged and lands on the nearer side; the
-/// settle is linear at 350dp/s (≈80ms end to end); a light haptic tick when the value changes;
+/// settle is linear (≈70ms end to end, measured on an R2); a light haptic tick when the value changes;
 /// disabled = 75% opacity.
 class SSwitch extends StatefulWidget {
   const SSwitch({super.key, required this.value, required this.onChanged});
@@ -1015,7 +1015,7 @@ class _SSwitchState extends State<SSwitch> with SingleTickerProviderStateMixin {
 
   void _settle(bool on) {
     final target = on ? 1.0 : 0.0;
-    final ms = ((target - _pos.value).abs() * _travel / 350 * 1000).round();
+    final ms = ((target - _pos.value).abs() * 70).round();
     _pos.animateTo(
       target,
       duration: Duration(milliseconds: ms.clamp(1, 1000)),

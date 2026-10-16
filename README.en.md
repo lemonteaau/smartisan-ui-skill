@@ -52,7 +52,7 @@ Just ask, e.g. "build a settings page in the Smartisan phone style" or "restyle 
 - **Icons**: 29 SVGs, plus the tinted variants used inside components.
 - **References**: component specs, a Figma node inventory, reference screenshots of all 17 pages, and `demo.html`, a full replica of the kit.
 - **Measured on a real device**: pressed states, page/dialog motion, bounce, segmented tabs, spacing and divider rules, sampled pixel by pixel and from 60fps recordings on a Smartisan R2 (`references/device-behavior.md`).
-- **Interaction and system spec**: the 6dp spacing grid, type scale and text colours read from the Smartisan OS framework resources, plus feel parameters taken from the community 1:1 rebuilds of Smartisan Music, Weather and Clock. Covers press timing (64ms / 100ms), push transitions with the staged title-bar animation, full-screen pages that rise from the bottom, title-bar icons that pop on press, a draggable switch, swipe-right-to-delete, rubber-band overscroll, a real wheel picker and the A–Z quick bar (`references/motion.md`).
+- **Interaction and system spec**: the 6dp spacing grid, type scale and text colours read from the Smartisan OS framework resources, plus feel parameters taken from the community 1:1 rebuilds of Smartisan Music, Weather and Clock. Covers press timing (64ms / 100ms), push transitions with the staged title-bar animation, full-screen pages that rise from the bottom, title-bar icons that pop on press, a draggable switch, swipe-right-to-delete, rubber-band overscroll, a real wheel picker, the A–Z quick bar, and Smartisan Clock's part choreography, where the main visual stays put and its parts move in layers (`references/motion.md`).
 
 ## Showcase
 
