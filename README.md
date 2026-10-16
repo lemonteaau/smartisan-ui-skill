@@ -4,7 +4,7 @@
 
 让 AI 编程助手直接写出 **Smartisan OS（锤子 / 坚果手机）** 风格界面的 Agent Skill。支持网页和 Flutter。
 
-**[在线预览](https://lemonteaau.github.io/smartisan-ui-skill/)**：完整 UI Kit 复刻，页面底部的 Interaction 板可以直接试交互（按压、开关拖拽、右滑删除、滚轮、横推转场、时钟切页的组件编排）。
+**[在线预览](https://lemonteaau.github.io/smartisan-ui-skill/)**：完整 UI Kit 复刻，封面下面的 Interaction 板可以直接试交互（按压、开关拖拽、右滑删除、滚轮、横推转场、时钟切页的组件编排）。
 
 ![smartisan-ui](docs/cover.png)
 

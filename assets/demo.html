@@ -301,7 +301,7 @@
 <main class="s-kit-canvas">
 
 <nav class="kit-toc">
-  <a href="#cover">Cover</a><a href="#icons">Icons</a><a href="#app-bar">App Bar</a><a href="#button">Button</a><a href="#bottom-nav">Bottom Navigation</a><a href="#bottom-sheet">Bottom Sheet</a><a href="#chip">Chip</a><a href="#picker">Date Time Picker</a><a href="#dialog">Dialog</a><a href="#divider">Divider</a><a href="#list">List</a><a href="#popup-menu">Popup Menu</a><a href="#search">Search Bar</a><a href="#slide-bar">Slide Bar</a><a href="#switch">Switch</a><a href="#tab-bar">Tab Bar</a><a href="#toast">Toast</a><a href="#real-device">Real device</a><a href="#interaction">Interaction</a>
+  <a href="#cover">Cover</a><a href="#interaction">Interaction</a><a href="#icons">Icons</a><a href="#app-bar">App Bar</a><a href="#button">Button</a><a href="#bottom-nav">Bottom Navigation</a><a href="#bottom-sheet">Bottom Sheet</a><a href="#chip">Chip</a><a href="#picker">Date Time Picker</a><a href="#dialog">Dialog</a><a href="#divider">Divider</a><a href="#list">List</a><a href="#popup-menu">Popup Menu</a><a href="#search">Search Bar</a><a href="#slide-bar">Slide Bar</a><a href="#switch">Switch</a><a href="#tab-bar">Tab Bar</a><a href="#toast">Toast</a><a href="#real-device">Real device</a>
 </nav>
 
 <!-- ===================== 00 Cover ===================== -->
@@ -312,6 +312,144 @@
     <p class="s-kit-cover__caption" style="margin:0">Based on Smartisan OS 8 on Smartisan R2</p>
   </div>
 </section>
+
+<!-- ===================== Interaction (framework behaviour, needs smartisan.js) ===================== -->
+<section class="s-kit-board" id="interaction">
+  <header class="s-kit-header"><img class="s-kit-header__logo" src="brand/smartisan-t-logo-30.svg" alt=""><h2 class="s-kit-header__title">Interaction</h2></header>
+  <div class="s-kit-body">
+    <div class="phone" id="phone">
+      <header class="s-appbar s-appbar--shadow" id="demo-bar">
+        <button data-s-back hidden aria-label="返回"><svg class="s-icon"><use href="#si-back"/></svg></button>
+        <span class="s-appbar__spacer"></span><span class="s-appbar__title">设置</span>
+        <div class="s-appbar__actions">
+          <button data-s-page="pg-root" aria-label="搜索"><svg class="s-icon"><use href="#si-search"/></svg></button>
+          <button data-s-page="pg-contacts" hidden aria-label="新建" data-s-open="pg-new"><svg class="s-icon"><use href="#si-add"/></svg></button>
+        </div>
+      </header>
+      <div class="s-stack" data-s-appbar="demo-bar">
+        <div class="s-stack__page s-page--textured" id="pg-root" data-title="设置">
+          <div style="padding:14px 12px 24px;display:flex;flex-direction:column;gap:14px">
+            <div class="s-list s-list--light-icons">
+              <a class="s-list-item" data-s-push="pg-contacts"><svg class="s-icon"><use href="#si-list"/></svg><div class="s-list-item__text"><span class="s-list-item__title">联系人</span></div><span class="s-list-item__detail" style="font-size:14px">36<svg class="s-icon"><use href="#si-chevron-right"/></svg></span></a>
+              <button class="s-list-item" data-s-open="sheet-time"><svg class="s-icon"><use href="#si-setting"/></svg><div class="s-list-item__text"><span class="s-list-item__title">闹钟时间</span></div><span class="s-list-item__detail" style="font-size:14px" id="time-out">07:30<svg class="s-icon"><use href="#si-chevron-right"/></svg></span></button>
+              <div class="s-list-item"><svg class="s-icon"><use href="#si-volume"/></svg><div class="s-list-item__text"><span class="s-list-item__title">按键音</span></div><input type="checkbox" class="s-switch" checked aria-label="按键音"></div>
+            </div>
+            <div class="s-list">
+              <button class="s-list-item" data-s-open="pg-new"><div class="s-list-item__text"><span class="s-list-item__title">新建（全屏页上推）</span></div><svg class="s-icon" style="color:var(--s-icon-chevron)"><use href="#si-chevron-right"/></svg></button>
+              <button class="s-list-item" data-s-open="sheet-del"><div class="s-list-item__text"><span class="s-list-item__title" style="color:var(--s-warning)">清除全部记录</span></div></button>
+              <button class="s-list-item" data-s-open="dlg-demo"><div class="s-list-item__text"><span class="s-list-item__title">对话框</span></div></button>
+              <button class="s-list-item" onclick="Smartisan.toast('已保存')"><div class="s-list-item__text"><span class="s-list-item__title">Toast</span></div></button>
+            </div>
+            <div>
+              <div class="s-section-title" style="border-radius:10px 10px 0 0">向右滑动可删除</div>
+              <div class="s-swipe" data-s-swipe>
+                <div class="s-swipe__actions"><button data-s-swipe-delete aria-label="删除"><svg class="s-icon" style="width:28px;height:28px"><use href="#si-c-delete"/></svg></button></div>
+                <div class="s-list-item"><div class="s-list-item__text"><span class="s-list-item__title">07:30</span><span class="s-list-item__subtitle">工作日</span></div><input type="checkbox" class="s-switch" checked aria-label="闹钟"></div>
+              </div>
+              <div class="s-swipe" data-s-swipe>
+                <div class="s-swipe__actions"><button data-s-swipe-delete aria-label="删除"><svg class="s-icon" style="width:28px;height:28px"><use href="#si-c-delete"/></svg></button></div>
+                <div class="s-list-item"><div class="s-list-item__text"><span class="s-list-item__title">09:00</span><span class="s-list-item__subtitle">周末</span></div><input type="checkbox" class="s-switch" aria-label="闹钟"></div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="s-stack__page" id="pg-contacts" data-title="联系人" hidden>
+          <div class="s-elastic" style="position:absolute;inset:0">
+            <div class="s-elastic__content" id="contacts"></div>
+          </div>
+          <div class="s-quickbar" id="qb"></div>
+        </div>
+      </div>
+
+      <div class="s-overlay s-overlay--sheet s-overlay--in-frame" id="sheet-time" hidden>
+        <div class="s-picker" style="width:100%;border-radius:20px 20px 0 0">
+          <div class="s-sheet__header">
+            <button data-s-close aria-label="取消"><svg class="s-icon s-icon--20"><use href="#si-close-thin"/></svg></button>
+            <span class="s-sheet__spacer"></span><span class="s-sheet__title">闹钟时间</span>
+            <button data-s-close id="time-ok" aria-label="确定"><svg class="s-icon s-icon--20"><use href="#si-confirm"/></svg></button>
+          </div>
+          <div class="s-picker__body"><div class="s-picker__well"><div class="s-picker__band"></div>
+            <div class="s-picker__col" data-s-wheel data-s-loop id="wh"></div>
+            <div class="s-picker__col" data-s-wheel data-s-loop id="wm"></div>
+          </div></div>
+        </div>
+      </div>
+
+      <div class="s-overlay s-overlay--sheet s-overlay--in-frame" id="sheet-del" hidden>
+        <div class="s-sheet">
+          <div class="s-sheet__header"><span class="s-sheet__spacer"></span><span class="s-sheet__title">清除后无法恢复</span><button data-s-close aria-label="关闭"><svg class="s-icon s-icon--20"><use href="#si-close-thin"/></svg></button></div>
+          <div class="s-sheet__body" style="gap:18px;padding:18px 18px 24px">
+            <button class="s-btn s-btn--sheet s-btn--danger s-btn--block" data-s-close onclick="Smartisan.toast('已清除')">清除全部记录</button>
+          </div>
+        </div>
+      </div>
+
+      <div class="s-overlay s-overlay--in-frame" id="dlg-demo" hidden>
+        <div class="s-dialog" style="width:368px">
+          <div class="s-dialog__header">提示</div>
+          <div class="s-dialog__body" style="text-align:center">缩放 0.85 → 1 并淡入，约 250ms；关闭更快，150ms。</div>
+          <div class="s-dialog__actions"><button data-s-close>取消</button><button data-s-close data-primary>好</button></div>
+        </div>
+      </div>
+
+      <div class="s-modal-page s-modal-page--in-frame" id="pg-new" hidden>
+        <header class="s-appbar s-appbar--shadow">
+          <button data-s-close aria-label="取消"><svg class="s-icon"><use href="#si-close-thin"/></svg></button>
+          <span class="s-appbar__spacer"></span><span class="s-appbar__title">新建联系人</span>
+          <button data-s-close aria-label="完成"><svg class="s-icon"><use href="#si-confirm"/></svg></button>
+        </header>
+        <div class="s-empty" style="height:calc(100% - 48px)">
+          <svg class="s-empty__icon" viewBox="0 0 120 120"><circle cx="60" cy="60" r="44" fill="none" stroke="currentColor" stroke-width="12"/></svg>
+          <div class="s-empty__title">还没有内容</div>
+          <div class="s-empty__desc">从底部升起 300ms，下面的页面不动</div>
+        </div>
+      </div>
+      <div class="s-toast-host s-toast-host--in-frame" hidden></div>
+    </div>
+
+
+    <div class="phone clockdemo">
+      <header class="s-appbar s-appbar--shadow"><span class="s-appbar__spacer"></span><span class="s-appbar__title" id="cd-title">世界时钟</span></header>
+      <div class="s-swap cd-stage">
+        <div class="cd-dial" aria-hidden="true"><span class="cd-num cd-12">12</span><span class="cd-num cd-3">3</span><i class="cd-cap"></i></div>
+        <div class="s-swap__panel" id="cd-world">
+          <i data-s-part class="cd-hand cd-h" style="--a:0deg;--from-r:-60deg;--to-r:30deg;--d:700ms"></i>
+          <i data-s-part class="cd-hand cd-m" style="--a:0deg;--from-r:-90deg;--to-r:60deg;--d:900ms"></i>
+          <i data-s-part class="cd-hand cd-s" style="--a:0deg;--from-r:-120deg;--to-r:90deg;--d:1000ms"></i>
+          <div class="cd-label"><b>本地时间</b><small id="cd-date"></small></div>
+        </div>
+        <div class="s-swap__panel" id="cd-alarm" hidden>
+          <i data-s-part class="cd-ear cd-ear--l" style="--from-x:24px;--from-y:24px;--d:700ms"></i>
+          <i data-s-part class="cd-ear cd-ear--r" style="--from-x:-24px;--from-y:24px;--d:700ms"></i>
+          <i data-s-part class="cd-hand cd-h" style="--a:225deg;--from-r:-60deg;--to-r:30deg;--d:700ms"></i>
+          <i data-s-part class="cd-hand cd-m" style="--a:180deg;--from-r:-90deg;--to-r:60deg;--d:900ms"></i>
+          <div class="cd-label"><b>07:30</b><small>工作日 · 下一个闹钟</small></div>
+        </div>
+        <div class="s-swap__panel" id="cd-watch" hidden>
+          <i data-s-part="pop" class="cd-face" style="--d:300ms;--from-s:0.96"></i>
+          <i data-s-part="pop" class="cd-crown" style="--from-y:14px;--d:400ms;--delay:130ms"></i>
+          <i data-s-part="pop" class="cd-key cd-key--l" style="--from-x:10px;--from-y:10px;--d:430ms;--delay:250ms"></i>
+          <i data-s-part="pop" class="cd-key cd-key--r" style="--from-x:-10px;--from-y:10px;--d:450ms;--delay:250ms"></i>
+          <i data-s-part class="cd-hand cd-s cd-s--watch" style="--a:0deg;--from-r:-30deg;--to-r:90deg;--d:400ms"></i>
+          <div class="cd-label"><b class="cd-red">00:00.00</b><small>点击开始计时</small></div>
+        </div>
+      </div>
+      <nav class="s-bottom-nav cd-nav">
+        <button data-s-show="cd-world" aria-current="page"><svg class="s-icon"><use href="#si-setting"/></svg>世界时钟</button>
+        <button data-s-show="cd-alarm"><svg class="s-icon"><use href="#si-star"/></svg>闹钟</button>
+        <button data-s-show="cd-watch"><svg class="s-icon"><use href="#si-playing"/></svg>秒表</button>
+      </nav>
+    </div>
+    <div class="stack" style="max-width:520px;font-size:14px;line-height:1.7;color:#636363">
+      <p style="margin:0">这块板子需要 <code>smartisan.js</code>。点"联系人"看页面横推和标题栏的分阶段转场（标题交叉淡入淡出、返回箭头延迟 100ms 从右侧滑入）；联系人页右侧是字母索引栏，列表到头有橡皮筋回弹（触屏）。</p>
+      <p style="margin:0">右边的时钟演示"组件编排"（锤子时钟 7.1.1 切页，R2 录屏）：表盘始终在原位，切页时指针顺着原方向转走并淡出（300ms），再从当前时间之前追上来，时针、分针、秒针各用 0.7 / 0.9 / 1.0s；闹钟的铃耳从斜后方滑回；秒表的旋钮和按键依次弹出，带一点过冲。</p>
+      <p style="margin:0">开关可以点也可以拖；闹钟行向右滑出删除按钮；"闹钟时间"打开真正能滚的滚轮；顶栏图标按住会弹性放大到 1.33 倍。</p>
+      <div class="row"><input type="checkbox" class="s-check" checked aria-label="选中"><input type="checkbox" class="s-check" aria-label="未选"><input type="checkbox" class="s-check s-check--red" checked aria-label="删除选中"><button class="s-round-add" aria-label="添加"></button><button class="s-round-remove" aria-label="移除"></button></div>
+      <div class="s-list" style="width:100%"><div class="s-list-item is-selected"><input type="checkbox" class="s-check" checked aria-label="选中"><div class="s-list-item__text"><span class="s-list-item__title">多选时的选中行</span></div></div><div class="s-list-item"><input type="checkbox" class="s-check" aria-label="未选"><div class="s-list-item__text"><span class="s-list-item__title">未选中行</span></div></div></div>
+    </div>
+  </div>
+</section>
+
 
 <!-- ===================== 01 Icons ===================== -->
 <section class="s-kit-board" id="icons">
@@ -725,143 +863,6 @@
     </div>
     <div class="stack" style="max-width:520px;font-size:14px;line-height:1.7;color:#636363">
       <p style="margin:0">Smartisan OS 8.5.3 · R2 实测：1080px ÷ 2.5 = 432dp；页面底 #f0f0f0 + 3.6px 竖条纹 #eeeeee；顶栏无底线，改为 14dp 渐隐阴影；列表前导图标 #cdcdcf；字体 Smartisan Compact + Noto Sans CJK SC。</p>
-    </div>
-  </div>
-</section>
-
-<!-- ===================== Interaction (framework behaviour, needs smartisan.js) ===================== -->
-<section class="s-kit-board" id="interaction">
-  <header class="s-kit-header"><img class="s-kit-header__logo" src="brand/smartisan-t-logo-30.svg" alt=""><h2 class="s-kit-header__title">Interaction</h2></header>
-  <div class="s-kit-body">
-    <div class="phone" id="phone">
-      <header class="s-appbar s-appbar--shadow" id="demo-bar">
-        <button data-s-back hidden aria-label="返回"><svg class="s-icon"><use href="#si-back"/></svg></button>
-        <span class="s-appbar__spacer"></span><span class="s-appbar__title">设置</span>
-        <div class="s-appbar__actions">
-          <button data-s-page="pg-root" aria-label="搜索"><svg class="s-icon"><use href="#si-search"/></svg></button>
-          <button data-s-page="pg-contacts" hidden aria-label="新建" data-s-open="pg-new"><svg class="s-icon"><use href="#si-add"/></svg></button>
-        </div>
-      </header>
-      <div class="s-stack" data-s-appbar="demo-bar">
-        <div class="s-stack__page s-page--textured" id="pg-root" data-title="设置">
-          <div style="padding:14px 12px 24px;display:flex;flex-direction:column;gap:14px">
-            <div class="s-list s-list--light-icons">
-              <a class="s-list-item" data-s-push="pg-contacts"><svg class="s-icon"><use href="#si-list"/></svg><div class="s-list-item__text"><span class="s-list-item__title">联系人</span></div><span class="s-list-item__detail" style="font-size:14px">36<svg class="s-icon"><use href="#si-chevron-right"/></svg></span></a>
-              <button class="s-list-item" data-s-open="sheet-time"><svg class="s-icon"><use href="#si-setting"/></svg><div class="s-list-item__text"><span class="s-list-item__title">闹钟时间</span></div><span class="s-list-item__detail" style="font-size:14px" id="time-out">07:30<svg class="s-icon"><use href="#si-chevron-right"/></svg></span></button>
-              <div class="s-list-item"><svg class="s-icon"><use href="#si-volume"/></svg><div class="s-list-item__text"><span class="s-list-item__title">按键音</span></div><input type="checkbox" class="s-switch" checked aria-label="按键音"></div>
-            </div>
-            <div class="s-list">
-              <button class="s-list-item" data-s-open="pg-new"><div class="s-list-item__text"><span class="s-list-item__title">新建（全屏页上推）</span></div><svg class="s-icon" style="color:var(--s-icon-chevron)"><use href="#si-chevron-right"/></svg></button>
-              <button class="s-list-item" data-s-open="sheet-del"><div class="s-list-item__text"><span class="s-list-item__title" style="color:var(--s-warning)">清除全部记录</span></div></button>
-              <button class="s-list-item" data-s-open="dlg-demo"><div class="s-list-item__text"><span class="s-list-item__title">对话框</span></div></button>
-              <button class="s-list-item" onclick="Smartisan.toast('已保存')"><div class="s-list-item__text"><span class="s-list-item__title">Toast</span></div></button>
-            </div>
-            <div>
-              <div class="s-section-title" style="border-radius:10px 10px 0 0">向右滑动可删除</div>
-              <div class="s-swipe" data-s-swipe>
-                <div class="s-swipe__actions"><button data-s-swipe-delete aria-label="删除"><svg class="s-icon" style="width:28px;height:28px"><use href="#si-c-delete"/></svg></button></div>
-                <div class="s-list-item"><div class="s-list-item__text"><span class="s-list-item__title">07:30</span><span class="s-list-item__subtitle">工作日</span></div><input type="checkbox" class="s-switch" checked aria-label="闹钟"></div>
-              </div>
-              <div class="s-swipe" data-s-swipe>
-                <div class="s-swipe__actions"><button data-s-swipe-delete aria-label="删除"><svg class="s-icon" style="width:28px;height:28px"><use href="#si-c-delete"/></svg></button></div>
-                <div class="s-list-item"><div class="s-list-item__text"><span class="s-list-item__title">09:00</span><span class="s-list-item__subtitle">周末</span></div><input type="checkbox" class="s-switch" aria-label="闹钟"></div>
-              </div>
-            </div>
-          </div>
-        </div>
-        <div class="s-stack__page" id="pg-contacts" data-title="联系人" hidden>
-          <div class="s-elastic" style="position:absolute;inset:0">
-            <div class="s-elastic__content" id="contacts"></div>
-          </div>
-          <div class="s-quickbar" id="qb"></div>
-        </div>
-      </div>
-
-      <div class="s-overlay s-overlay--sheet s-overlay--in-frame" id="sheet-time" hidden>
-        <div class="s-picker" style="width:100%;border-radius:20px 20px 0 0">
-          <div class="s-sheet__header">
-            <button data-s-close aria-label="取消"><svg class="s-icon s-icon--20"><use href="#si-close-thin"/></svg></button>
-            <span class="s-sheet__spacer"></span><span class="s-sheet__title">闹钟时间</span>
-            <button data-s-close id="time-ok" aria-label="确定"><svg class="s-icon s-icon--20"><use href="#si-confirm"/></svg></button>
-          </div>
-          <div class="s-picker__body"><div class="s-picker__well"><div class="s-picker__band"></div>
-            <div class="s-picker__col" data-s-wheel data-s-loop id="wh"></div>
-            <div class="s-picker__col" data-s-wheel data-s-loop id="wm"></div>
-          </div></div>
-        </div>
-      </div>
-
-      <div class="s-overlay s-overlay--sheet s-overlay--in-frame" id="sheet-del" hidden>
-        <div class="s-sheet">
-          <div class="s-sheet__header"><span class="s-sheet__spacer"></span><span class="s-sheet__title">清除后无法恢复</span><button data-s-close aria-label="关闭"><svg class="s-icon s-icon--20"><use href="#si-close-thin"/></svg></button></div>
-          <div class="s-sheet__body" style="gap:18px;padding:18px 18px 24px">
-            <button class="s-btn s-btn--sheet s-btn--danger s-btn--block" data-s-close onclick="Smartisan.toast('已清除')">清除全部记录</button>
-          </div>
-        </div>
-      </div>
-
-      <div class="s-overlay s-overlay--in-frame" id="dlg-demo" hidden>
-        <div class="s-dialog" style="width:368px">
-          <div class="s-dialog__header">提示</div>
-          <div class="s-dialog__body" style="text-align:center">缩放 0.85 → 1 并淡入，约 250ms；关闭更快，150ms。</div>
-          <div class="s-dialog__actions"><button data-s-close>取消</button><button data-s-close data-primary>好</button></div>
-        </div>
-      </div>
-
-      <div class="s-modal-page s-modal-page--in-frame" id="pg-new" hidden>
-        <header class="s-appbar s-appbar--shadow">
-          <button data-s-close aria-label="取消"><svg class="s-icon"><use href="#si-close-thin"/></svg></button>
-          <span class="s-appbar__spacer"></span><span class="s-appbar__title">新建联系人</span>
-          <button data-s-close aria-label="完成"><svg class="s-icon"><use href="#si-confirm"/></svg></button>
-        </header>
-        <div class="s-empty" style="height:calc(100% - 48px)">
-          <svg class="s-empty__icon" viewBox="0 0 120 120"><circle cx="60" cy="60" r="44" fill="none" stroke="currentColor" stroke-width="12"/></svg>
-          <div class="s-empty__title">还没有内容</div>
-          <div class="s-empty__desc">从底部升起 300ms，下面的页面不动</div>
-        </div>
-      </div>
-      <div class="s-toast-host s-toast-host--in-frame" hidden></div>
-    </div>
-
-
-    <div class="phone clockdemo">
-      <header class="s-appbar s-appbar--shadow"><span class="s-appbar__spacer"></span><span class="s-appbar__title" id="cd-title">世界时钟</span></header>
-      <div class="s-swap cd-stage">
-        <div class="cd-dial" aria-hidden="true"><span class="cd-num cd-12">12</span><span class="cd-num cd-3">3</span><i class="cd-cap"></i></div>
-        <div class="s-swap__panel" id="cd-world">
-          <i data-s-part class="cd-hand cd-h" style="--a:0deg;--from-r:-60deg;--to-r:30deg;--d:700ms"></i>
-          <i data-s-part class="cd-hand cd-m" style="--a:0deg;--from-r:-90deg;--to-r:60deg;--d:900ms"></i>
-          <i data-s-part class="cd-hand cd-s" style="--a:0deg;--from-r:-120deg;--to-r:90deg;--d:1000ms"></i>
-          <div class="cd-label"><b>本地时间</b><small id="cd-date"></small></div>
-        </div>
-        <div class="s-swap__panel" id="cd-alarm" hidden>
-          <i data-s-part class="cd-ear cd-ear--l" style="--from-x:24px;--from-y:24px;--d:700ms"></i>
-          <i data-s-part class="cd-ear cd-ear--r" style="--from-x:-24px;--from-y:24px;--d:700ms"></i>
-          <i data-s-part class="cd-hand cd-h" style="--a:225deg;--from-r:-60deg;--to-r:30deg;--d:700ms"></i>
-          <i data-s-part class="cd-hand cd-m" style="--a:180deg;--from-r:-90deg;--to-r:60deg;--d:900ms"></i>
-          <div class="cd-label"><b>07:30</b><small>工作日 · 下一个闹钟</small></div>
-        </div>
-        <div class="s-swap__panel" id="cd-watch" hidden>
-          <i data-s-part="pop" class="cd-face" style="--d:300ms;--from-s:0.96"></i>
-          <i data-s-part="pop" class="cd-crown" style="--from-y:14px;--d:400ms;--delay:130ms"></i>
-          <i data-s-part="pop" class="cd-key cd-key--l" style="--from-x:10px;--from-y:10px;--d:430ms;--delay:250ms"></i>
-          <i data-s-part="pop" class="cd-key cd-key--r" style="--from-x:-10px;--from-y:10px;--d:450ms;--delay:250ms"></i>
-          <i data-s-part class="cd-hand cd-s cd-s--watch" style="--a:0deg;--from-r:-30deg;--to-r:90deg;--d:400ms"></i>
-          <div class="cd-label"><b class="cd-red">00:00.00</b><small>点击开始计时</small></div>
-        </div>
-      </div>
-      <nav class="s-bottom-nav cd-nav">
-        <button data-s-show="cd-world" aria-current="page"><svg class="s-icon"><use href="#si-setting"/></svg>世界时钟</button>
-        <button data-s-show="cd-alarm"><svg class="s-icon"><use href="#si-star"/></svg>闹钟</button>
-        <button data-s-show="cd-watch"><svg class="s-icon"><use href="#si-playing"/></svg>秒表</button>
-      </nav>
-    </div>
-    <div class="stack" style="max-width:520px;font-size:14px;line-height:1.7;color:#636363">
-      <p style="margin:0">这块板子需要 <code>smartisan.js</code>。点"联系人"看页面横推和标题栏的分阶段转场（标题交叉淡入淡出、返回箭头延迟 100ms 从右侧滑入）；联系人页右侧是字母索引栏，列表到头有橡皮筋回弹（触屏）。</p>
-      <p style="margin:0">右边的时钟演示"组件编排"（锤子时钟 7.1.1 切页，R2 录屏）：表盘始终在原位，切页时指针顺着原方向转走并淡出（300ms），再从当前时间之前追上来，时针、分针、秒针各用 0.7 / 0.9 / 1.0s；闹钟的铃耳从斜后方滑回；秒表的旋钮和按键依次弹出，带一点过冲。</p>
-      <p style="margin:0">开关可以点也可以拖；闹钟行向右滑出删除按钮；"闹钟时间"打开真正能滚的滚轮；顶栏图标按住会弹性放大到 1.33 倍。</p>
-      <div class="row"><input type="checkbox" class="s-check" checked aria-label="选中"><input type="checkbox" class="s-check" aria-label="未选"><input type="checkbox" class="s-check s-check--red" checked aria-label="删除选中"><button class="s-round-add" aria-label="添加"></button><button class="s-round-remove" aria-label="移除"></button></div>
-      <div class="s-list" style="width:100%"><div class="s-list-item is-selected"><input type="checkbox" class="s-check" checked aria-label="选中"><div class="s-list-item__text"><span class="s-list-item__title">多选时的选中行</span></div></div><div class="s-list-item"><input type="checkbox" class="s-check" aria-label="未选"><div class="s-list-item__text"><span class="s-list-item__title">未选中行</span></div></div></div>
     </div>
   </div>
 </section>
